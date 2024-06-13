@@ -7,8 +7,9 @@ channels:
   - defaults
 
 dependencies:
-  - python=3.11.4
+  - python
   - jupyter
+  - pip
   - numpy
   - scikit-learn
   - scipy
@@ -28,7 +29,6 @@ dependencies:
   - wandb=0.15.9
   - pyyaml
   - python-box
-  - ensure
   - pip:
       - python-dotenv
       - langchain
@@ -38,7 +38,5 @@ dependencies:
       - transformers
       - datasets
       - tensorboard
+      - ensure
       - -e .
-
-platforms:
-  - osx-arm64
