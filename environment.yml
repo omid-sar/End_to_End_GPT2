@@ -1,9 +1,9 @@
-name: transformer_en_fa
+name: GPT2
 
 channels:
   - pytorch
   - conda-forge
-  - apple # Including apple channel for M1 compatibility
+  - apple
   - defaults
 
 dependencies:
@@ -26,8 +26,10 @@ dependencies:
   - tensorboard=2.13.0
   - altair=5.1.1
   - wandb=0.15.9
+  - pyyaml
+  - python-box
+  - ensure
   - pip:
-      - openai
       - python-dotenv
       - langchain
       - docarray
@@ -36,7 +38,7 @@ dependencies:
       - transformers
       - datasets
       - tensorboard
+      - -e .
 
-# For M1 Macs, use PyTorch's special build
 platforms:
   - osx-arm64

@@ -1,0 +1,53 @@
+artifacts_root: artifacts
+
+
+data_ingestion:
+  root_dir: artifacts/data_ingestion
+  dataset_name: 
+  local_data_file: artifacts/data_ingestion/data #split to %2
+
+data_validation:
+  root_dir: artifacts/data_validation
+  STATUS_FILE: artifacts/data_validation/status.txt
+  ALL_REQUIRED_FILES: ["state.json","dataset_info.json", "data-00000-of-00001.arrow" ] # should modify since 4 files saved 
+
+data_transformation:
+  root_dir: artifacts/data_transformation
+  tokenizer_file: artifacts/data_transformation/tokenizer_{0}.json
+  local_data_file: artifacts/data_ingestion/data 
+  lang_src: "en"
+  lang_tgt: "fa"
+  seq_len: 50
+  batch_size: 32
+  train_val_split_ratio: [0.9, 0.1]
+
+model_config:
+  root_dir: artifacts/model_config
+  verification_info_dir: artifacts/model_config/verification_info
+  verification_summary_file: verification_model_summary.txt
+  verification_weights_file: verification_initial_weights.pt
+  src_seq_len: 50
+  tgt_seq_len: 50
+  d_model: 512
+  N: 6
+  h: 8
+  dropout: 0.1
+  d_ff: 2048
+
+model_training:
+  root_dir: artifacts/model_training
+  model_folder: artifacts/model_training/model_en_fa_weights
+  model_basename: "tmodel_"
+  tensorboard_log_dir: logs
+  lr: 0.0001
+  max_len: 50
+  preload:
+  num_epochs: 1 
+
+model_evaluation:
+  root_dir: artifacts/model_evaluation
+
+model_inference:
+root_dir: artifacts/model_inference
+
+
