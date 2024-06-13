@@ -3,8 +3,8 @@ from pathlib import Path
 from datasets import load_dataset
 
 from GPT2.logging import logger
-from transformerEnFa.utils.common import get_size
-from transformerEnFa.entity import DataIngestionConfig
+from GPT2.utils.common import get_size
+from GPT2.entity import DataIngestionConfig
 
 
 class DataIngestion:

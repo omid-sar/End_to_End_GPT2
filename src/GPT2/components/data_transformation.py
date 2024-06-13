@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 import torch.nn
 from torch.utils.data import Dataset, DataLoader, random_split
-from transformerEnFa.logging import logger
+from GPT2.logging import logger
 
 # Huggingface Tokenizers
 from datasets import load_dataset, load_from_disk

@@ -21,7 +21,7 @@ data_transformation:
   batch_size: 32
   train_val_split_ratio: [0.9, 0.1]
 
-model_config:
+gpt_config:
   root_dir: artifacts/model_config
   verification_info_dir: artifacts/model_config/verification_info
   verification_summary_file: verification_model_summary.txt

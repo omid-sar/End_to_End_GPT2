@@ -3,12 +3,12 @@ import torch
 import torch.nn as nn
 from pathlib import Path
 from datasets import load_dataset, load_from_disk
-from transformerEnFa.logging import logger
-from transformerEnFa.utils.model_utils import get_device, latest_weights_file_path
-from transformerEnFa.config.configuration import ConfigurationManager
-from transformerEnFa.components.data_transformation import get_or_build_tokenizer
-from transformerEnFa.models.transformer import built_transformer
-from transformerEnFa.components.data_transformation import BilingualDataset
+from GPT2.logging import logger
+from GPT2.utils.model_utils import get_device, latest_weights_file_path
+from GPT2.config.configuration import ConfigurationManager
+from GPT2.components.data_transformation import get_or_build_tokenizer
+from GPT2.models.transformer import built_transformer
+from GPT2.components.data_transformation import BilingualDataset
 
 
 

@@ -26,7 +26,7 @@ class DataTransformationConfig:
     train_val_split_ratio: Tuple[float, float]  
 
 @dataclass(frozen=True)
-class ModelConfig:
+class GPTConfig:
     root_dir: Path
     verification_info_dir: Path
     verification_summary_file: Path

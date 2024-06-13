@@ -3,7 +3,7 @@ from GPT2.utils.common import read_yaml, create_directories
 from GPT2.entity import DataIngestionConfig
 from GPT2.entity import DataValidationConfig
 from GPT2.entity import DataTransformationConfig
-from GPT2.entity import ModelConfig
+from GPT2.entity import GPTConfig
 from GPT2.entity import ModelTrainingConfig
 from GPT2.entity import ModelEvaluationConfig
 from GPT2.entity import ModelInferenceConfig
@@ -11,12 +11,9 @@ from GPT2.entity import ModelInferenceConfig
 class ConfigurationManager:
     def __init__(
         self,
-        config_filepath = CONFIG_FILE_PATH,
-        params_filepath = PARAMS_FILE_PATH):
+        config_filepath = CONFIG_FILE_PATH):
 
         self.config = read_yaml(config_filepath)
-        self.params = read_yaml(params_filepath)
-
         create_directories([self.config.artifacts_root])
 
 
@@ -64,14 +61,14 @@ class ConfigurationManager:
             train_val_split_ratio = tuple(config.train_val_split_ratio),
         )
 
-    def get_model_config(self) -> ModelConfig:
-        config = self.config.model_config
+    def get_gpt_config(self) -> GPTConfig:
+        config = self.config.gpt_config
 
         create_directories([config.root_dir])
         create_directories([config.verification_info_dir])
         
 
-        return ModelConfig(
+        return GPTConfig(
             root_dir = config.root_dir,
             verification_info_dir = config.verification_info_dir,
             verification_summary_file = config.verification_summary_file, 
