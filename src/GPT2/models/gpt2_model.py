@@ -19,6 +19,8 @@ class GPTconfig:
     n_layer: int = 12
     n_head: int = 12
     n_embd : int = 768 
+    mlp_hidden_size: int = 3072
+
 
 class CausalSelfAttention(nn.Module):
 
@@ -26,6 +28,28 @@ class CausalSelfAttention(nn.Module):
         super(CausalSelfAttention, self).__init__()
         self.config = config
 
+        self.c_attn = nn.Linear()
+        self.c_proj = 
+
+
+
+
+
+
+class MLP(nn.Module):
+
+    def __init__(self, config):
+        super(MLP, self).__init__()
+        self.config = config
+
+        self.c_fc = nn.Linear(config.n_embd, config.mlp_hidden_size)
+        self.gelu = nn.GELU(approximate='tanh')
+        self.c_proj = nn.Linear(config.mlp_hidden_size, config.n_embd)
+
+    def forward(self, x):
+        x = self.c_fc(x)
+        x = self.gelu(x)
+        x = self.c_proj(x)
 
 
 class Block(nn.Module):
@@ -34,10 +58,15 @@ class Block(nn.Module):
         super(Block, self).__init__()
         self.config = config
 
-        self.ln1 = nn.LayerNorm(config.n_embd)
+        self.ln_1 = nn.LayerNorm(config.n_embd)
         self.attn = CausalSelfAttention(config)
-        
+        self.ln_2 = nn.LayerNorm(config.n_embd)
+        self.mlp = MLP(config)
 
+    def forward(self, x):
+        x = x + self.attn(self.ln_1(x))
+        x = x + self.mlp(self.ln_2(x))
+        return x
 
 
 class GPT(nn.Module):
