@@ -35,12 +35,12 @@ class CausalSelfAttention(nn.Module):
         self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
         self.c_proj = nn.Linear(config.n_embd,config.n_embd)
         # NOT really a 'bias', more of a mask, but following HF naming though
-        self.register_buffer("bias", torch.tril(config.block_size, config.block_size)).view(1,1,config.block_size, config.block_size)
+        self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size)).view(1, 1, config.block_size, config.block_size))
 
     def forward(self, x):
         # (Batch, Seq_len, embd_dim)
         B, T, C = x.size()
-        d_k = self.n_head, C // self.n_head 
+        d_k = C // self.n_head 
         # we concatant Wq, Wk, Wv and multiply them with X (Batch, Seq_len, embd_dim)
         # then slpit then q,k,v and then reshape them based on size of head to calculate MultiHead attention 
         qkv = self.c_attn(x)
@@ -55,7 +55,10 @@ class CausalSelfAttention(nn.Module):
         att = F.softmax(att, dim=1)
         #(Batch, n_head, Seq_len, Seq_len) X (Batch, n_head, Seq_len, d_k) = (Batch, n_head, Seq_len, d_k)
         y = att @ v 
-        # (Batch, n_head, Seq_len, d_k) -> 
+        # (Batch, n_head, Seq_len, d_k) -> (Batch, Seq_len, n_head, d_k) -> (Batch, Seq_len, embd_dim)
+        y = y.transpose(1,2).contiguous().view(B,T,C)
+        y = self.c_proj(y)
+        return y 
         
 
 
@@ -99,7 +102,7 @@ class Block(nn.Module):
 
 class GPT(nn.Module):
 
-    def __init(self, config):
+    def __init__(self, config):
         super(GPT, self).__init__()
         self.config = config
 
@@ -109,4 +112,4 @@ class GPT(nn.Module):
             h = nn.ModuleList([Block(config) for _ in range(config.n_layer)]), 
             ln_f = nn.LayerNorm(config.n_embd)
         )) 
-        self.lm_head = nn.Linear(config.vocab_size, config.n_embd, bias=False)
+        self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
