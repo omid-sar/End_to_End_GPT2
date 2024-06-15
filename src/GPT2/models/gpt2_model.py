@@ -7,10 +7,10 @@ from GPT2.logging import logger
 
 
 # ----------- Temporary to load Config localy here not main.py -----
-from GPT2.config.configuration import ConfigurationManager
-import os
-os.getcwd()
-os.chdir('../../../')
+#from GPT2.config.configuration import ConfigurationManager
+#import os
+#os.getcwd()
+#os.chdir('../../../')
 #config = ConfigurationManager()
 # -------------------------------------------------------------------
 
@@ -22,8 +22,6 @@ class GPTConfig:
     n_head: int = 12
     n_embd : int = 768 
 
-
-class GPT(nn.Module):
 
 class CausalSelfAttention(nn.Module):
 
@@ -110,6 +108,9 @@ class GPT(nn.Module):
         )) 
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
 
+    #def forward(self, idx):
+
+
 
     @classmethod
     def from_pretrained(cls, model_type):
@@ -157,6 +158,38 @@ class GPT(nn.Module):
                 assert sd_hf[k].shape == sd[k].shape
                 with torch.no_grad():
                     sd[k].copy_(sd_hf[k])
-
+        logger.info(f"Successfully weights loaded from pretrained gpt {model_type}")
         return model
+
+# --------------------------------- Load weights from HG to our local --------------------------
+model = GPT.from_pretrained('gpt2')
+
+
+
+
+
+
+#----------------------Model Experiments ------------------------------
+config = GPTConfig()
+
+
+mlp = MLP(config)
+
+causal_self_attentiopn = CausalSelfAttention(config)
+
+block = Block(config)
+
+block_h = [Block(config) for _ in range(config.n_layer)]
+
+transformer = nn.ModuleDict(dict(
+    wte = nn.Embedding(config.vocab_size, config.n_embd), 
+    wpe = nn.Embedding(config.block_size, config.n_embd),
+    h = nn.ModuleList([Block(config) for _ in range(config.n_layer)]), 
+    ln_f = nn.LayerNorm(config.n_embd)
+)) 
+
+
+
+
+
 
