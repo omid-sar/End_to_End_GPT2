@@ -109,6 +109,19 @@ class GPT(nn.Module):
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
 
     def forward(self, idx):
+        B, T = idx.size()
+        assert T <= self.config.block_size, f" The forward Sequence length is {T} which CANNOT be longer that block size {self.config.block_size}"
+        pos =torch.arange(0, T , dtype=torch.long, device=idx.device)
+        pos_emb = self.transformer.wpe(pos) # Positional embeddings of shape (T, n_embd)
+        tok_emb = self.transformer.wpe(idx) # token embeddings of shape (B, T , n_embd)
+        x = pos_emb + tok_emb
+
+        for block in self.transformer.h:
+            x = block(x)
+        x = self.transformer.ln_f(x)
+        logits =self.lm_head(x)
+        return logits
+
 
 
 
