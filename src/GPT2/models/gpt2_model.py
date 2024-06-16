@@ -52,11 +52,11 @@ class CausalSelfAttention(nn.Module):
 
         att = q @ k.transpose(-2,-1) * (1.0/ math.sqrt(d_k))
         att = att.masked_fill(self.bias[:, :, :T, :T] == 0 , float('-inf')) # MASK
-        att = F.softmax(att, dim=1)
+        att = F.softmax(att, dim=-1)
         #(Batch, n_head, Seq_len, Seq_len) X (Batch, n_head, Seq_len, d_k) = (Batch, n_head, Seq_len, d_k)
         y = att @ v 
         # (Batch, n_head, Seq_len, d_k) -> (Batch, Seq_len, n_head, d_k) -> (Batch, Seq_len, embd_dim)
-        y = y.transpose(1,2).contiguous().view(B,T,C)
+        y = y.transpose(1,2).contiguous().view(B, T, C)
         y = self.c_proj(y)
         return y 
         
@@ -75,6 +75,7 @@ class MLP(nn.Module):
         x = self.c_fc(x)
         x = self.gelu(x)
         x = self.c_proj(x)
+        return x
 
 
 class Block(nn.Module):
@@ -113,17 +114,14 @@ class GPT(nn.Module):
         assert T <= self.config.block_size, f" The forward Sequence length is {T} which CANNOT be longer that block size {self.config.block_size}"
         pos =torch.arange(0, T , dtype=torch.long, device=idx.device)
         pos_emb = self.transformer.wpe(pos) # Positional embeddings of shape (T, n_embd)
-        tok_emb = self.transformer.wpe(idx) # token embeddings of shape (B, T , n_embd)
+        tok_emb = self.transformer.wte(idx) # token embeddings of shape (B, T , n_embd)
         x = pos_emb + tok_emb
 
         for block in self.transformer.h:
             x = block(x)
         x = self.transformer.ln_f(x)
-        logits =self.lm_head(x)
+        logits = self.lm_head(x) # (B, T, vocab_size)
         return logits
-
-
-
 
     @classmethod
     def from_pretrained(cls, model_type):
@@ -174,41 +172,5 @@ class GPT(nn.Module):
         logger.info(f"Successfully weights loaded from pretrained gpt {model_type}")
         return model
 
-# --------------------------------- Load weights from HG to our local --------------------------
-model = GPT.from_pretrained('gpt2')
 
-
-
-
-
-
-#----------------------Model Experiments ------------------------------
-""""
-config = GPTConfig()
-
-
-mlp = MLP(config)
-
-causal_self_attentiopn = CausalSelfAttention(config)
-
-block = Block(config)
-
-block_h = [Block(config) for _ in range(config.n_layer)]
-
-block_h_lsit = nn.ModuleList([Block(config) for _ in range(config.n_layer)])
-
-transformer = nn.ModuleDict(dict(
-    wte = nn.Embedding(config.vocab_size, config.n_embd), 
-    wpe = nn.Embedding(config.block_size, config.n_embd),
-    h = nn.ModuleList([Block(config) for _ in range(config.n_layer)]), 
-    ln_f = nn.LayerNorm(config.n_embd)
-)) 
-
-
-print(mlp, '\n', causal_self_attentiopn, '\n', block, '\n', block_h, '\n \n \n', block_h_lsit, '\n', transformer)
-""""
-
-
-
-
-
+#---------------------- the Model weights and biases Experiments ------------------------------
