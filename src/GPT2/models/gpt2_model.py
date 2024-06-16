@@ -108,7 +108,7 @@ class GPT(nn.Module):
         )) 
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
 
-    #def forward(self, idx):
+    def forward(self, idx):
 
 
 
@@ -170,6 +170,7 @@ model = GPT.from_pretrained('gpt2')
 
 
 #----------------------Model Experiments ------------------------------
+""""
 config = GPTConfig()
 
 
@@ -181,6 +182,8 @@ block = Block(config)
 
 block_h = [Block(config) for _ in range(config.n_layer)]
 
+block_h_lsit = nn.ModuleList([Block(config) for _ in range(config.n_layer)])
+
 transformer = nn.ModuleDict(dict(
     wte = nn.Embedding(config.vocab_size, config.n_embd), 
     wpe = nn.Embedding(config.block_size, config.n_embd),
@@ -188,6 +191,9 @@ transformer = nn.ModuleDict(dict(
     ln_f = nn.LayerNorm(config.n_embd)
 )) 
 
+
+print(mlp, '\n', causal_self_attentiopn, '\n', block, '\n', block_h, '\n \n \n', block_h_lsit, '\n', transformer)
+""""
 
 
 
