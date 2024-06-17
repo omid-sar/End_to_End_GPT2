@@ -1,7 +1,7 @@
 import os
-from transformerEnFa.logging import logger
+from GPT2.logging import logger
 
-from transformerEnFa.entity import DataValidationConfig
+from GPT2.entity import DataValidationConfig
 
 
 class DataValidation:

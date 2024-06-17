@@ -1,12 +1,12 @@
 from  GPT2.research.gpt2_HF_w_model import GPT, GPTConfig
+from GPT2.utils.model_utils import get_device
 from GPT2.logging import logger
 
 import torch
 from torch.nn import functional as F
 
 # --------------------------------- Load weights from HG to our local --------------------------
-device = "cuda" if torch.cuda.is_available() else("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
-print(f"Using Device: {device}")
+device = get_device()
 
 text = "Hello, I'm a model that can complete sentences. Watch me go!"
 num_return_sequences = 5

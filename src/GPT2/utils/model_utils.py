@@ -4,7 +4,7 @@ import torch
 from GPT2.logging import logger
 
 def get_device():
-    device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+    device = "cuda" if torch.cuda.is_available() else("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
     logger.info(f"Using device: {device}")
     if device == 'cuda':
         logger.info(f"Device name: {torch.cuda.get_device_name(0)}")

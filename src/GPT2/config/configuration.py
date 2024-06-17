@@ -25,6 +25,7 @@ class ConfigurationManager:
         data_ingestion_config = DataIngestionConfig(
             root_dir = config.root_dir,
             dataset_name = config.dataset_name,
+            dataset_url = config.dataset_url,
             local_data_file = config.local_data_file
         )
 

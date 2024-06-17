@@ -26,7 +26,7 @@ class GPTConfig:
 class CausalSelfAttention(nn.Module):
 
     def __init__(self, config):
-        super(CausalSelfAttention, self).__init__()
+        super().__init__()
         assert config.n_embd % config.n_head == 0, "n_embd is not divisble by n_head" 
         self.n_head = config.n_head
         self.n_embd = config.n_embd
@@ -64,7 +64,7 @@ class CausalSelfAttention(nn.Module):
 class MLP(nn.Module):
 
     def __init__(self, config):
-        super(MLP, self).__init__()
+        super().__init__()
         self.config = config
 
         self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd)
@@ -81,7 +81,7 @@ class MLP(nn.Module):
 class Block(nn.Module):
 
     def __init__(self, config):
-        super(Block, self).__init__()
+        super().__init__()
         self.config = config
 
         self.ln_1 = nn.LayerNorm(config.n_embd)
@@ -98,7 +98,7 @@ class Block(nn.Module):
 class GPT(nn.Module):
 
     def __init__(self, config):
-        super(GPT, self).__init__()
+        super().__init__()
         self.config = config
 
         self.transformer = nn.ModuleDict(dict(

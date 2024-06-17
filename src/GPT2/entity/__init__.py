@@ -6,6 +6,7 @@ from typing import Tuple
 class DataIngestionConfig:
     root_dir: Path
     dataset_name: str
+    dataset_url: str
     local_data_file: Path
 
 @dataclass(frozen=True)
