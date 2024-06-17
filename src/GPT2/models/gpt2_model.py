@@ -171,6 +171,3 @@ class GPT(nn.Module):
                     sd[k].copy_(sd_hf[k])
         logger.info(f"Successfully weights loaded from pretrained gpt {model_type}")
         return model
-
-
-#---------------------- the Model weights and biases Experiments ------------------------------
