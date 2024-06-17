@@ -1,13 +1,15 @@
-from  GPT2.models.gpt2_model import GPT
+from  GPT2.research.gpt2_HF_w_model import GPT
 from GPT2.logging import logger
 
 import torch
 from torch.nn import functional as F
 
 # --------------------------------- Load weights from HG to our local --------------------------
+
 text = "Hello, I'm a model that can complete sentences. Watch me go!"
 num_return_sequences = 5
 max_lenght = 50
+logger.info(f"Inferencing GPT2 model with HuggingFace GPT2 Weights,[num_return_sequences: {num_return_sequences}],[max_lenght: {max_lenght}], [Sample text: {text}]")
 
 model = GPT.from_pretrained('gpt2')
 model.eval()
