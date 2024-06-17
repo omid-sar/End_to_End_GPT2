@@ -3,10 +3,10 @@ import os
 import torch
 from pathlib import Path
 
-from transformerEnFa.logging import logger
-from transformerEnFa.config.configuration import ConfigurationManager
-from transformerEnFa.components.model_training import train_model
-from transformerEnFa.utils.model_utils import get_device
+from GPT2.logging import logger
+from GPT2.config.configuration import ConfigurationManager
+from GPT2.components.model_training import train_model
+from GPT2.utils.model_utils import get_device
 
 
 class ModelTrainingPipeline():

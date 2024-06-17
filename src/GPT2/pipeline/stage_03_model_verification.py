@@ -1,11 +1,11 @@
 import torch
 from pathlib import Path
-from transformerEnFa.utils.common import  create_directories
-from transformerEnFa.utils.model_utils import get_device
-from transformerEnFa.models.transformer import built_transformer
-from transformerEnFa.config.configuration import ConfigurationManager
-from transformerEnFa.utils.model_utils import save_model_summary, save_initial_weights
-from transformerEnFa.logging import logger
+from GPT2.utils.common import  create_directories
+from GPT2.utils.model_utils import get_device
+from GPT2.models.transformer import built_transformer
+from GPT2.config.configuration import ConfigurationManager
+from GPT2.utils.model_utils import save_model_summary, save_initial_weights
+from GPT2.logging import logger
 
 class ModelVerificationTrainingPipeline:
     def __init__(self, tokenizer_src, tokenizer_tgt):

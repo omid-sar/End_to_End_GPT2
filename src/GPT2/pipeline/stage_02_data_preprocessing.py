@@ -1,6 +1,6 @@
 from GPT2.logging import logger 
 from GPT2.config.configuration import ConfigurationManager
-from transformerEnFa.components.data_validation import DataValidation
+from GPT2.components.data_validation import DataValidation
 
 
 class DataValidationTrainingPipeline():

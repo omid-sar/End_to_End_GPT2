@@ -1,9 +1,9 @@
-from transformerEnFa.logging import logger 
-from transformerEnFa.config.configuration import ConfigurationManager
-from transformerEnFa.utils.model_utils import get_device, latest_weights_file_path
-from transformerEnFa.components.model_evaluation import run_validation
-from transformerEnFa.components.data_transformation import get_ds
-from transformerEnFa.models.transformer import built_transformer
+from GPT2.logging import logger 
+from GPT2.config.configuration import ConfigurationManager
+from GPT2.utils.model_utils import get_device, latest_weights_file_path
+from GPT2.components.model_evaluation import run_validation
+from GPT2.components.data_transformation import get_ds
+from GPT2.models.transformer import built_transformer
 
 
 class ModelEvaluationPipeline:

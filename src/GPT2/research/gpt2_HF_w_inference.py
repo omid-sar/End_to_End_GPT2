@@ -1,10 +1,12 @@
-from  GPT2.research.gpt2_HF_w_model import GPT
+from  GPT2.research.gpt2_HF_w_model import GPT, GPTConfig
 from GPT2.logging import logger
 
 import torch
 from torch.nn import functional as F
 
 # --------------------------------- Load weights from HG to our local --------------------------
+device = "cuda" if torch.cuda.is_available() else("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
+print(f"Using Device: {device}")
 
 text = "Hello, I'm a model that can complete sentences. Watch me go!"
 num_return_sequences = 5
@@ -12,10 +14,10 @@ max_lenght = 50
 logger.info(f"Inferencing GPT2 model with HuggingFace GPT2 Weights,[num_return_sequences: {num_return_sequences}],[max_lenght: {max_lenght}], [Sample text: {text}]")
 
 model = GPT.from_pretrained('gpt2')
+#model = GPT(GPTConfig()) # if want to try the model with random weights!
 model.eval()
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model.to(device)
 
+model.to(device)
 
 
 import tiktoken
@@ -46,5 +48,6 @@ for i in range(num_return_sequences):
     tokens = x[i, :max_lenght].tolist()
     decode = enc.decode(tokens)
     print(f'{"*" * 50} \n {decode}')
+
 
 

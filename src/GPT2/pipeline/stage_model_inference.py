@@ -1,6 +1,6 @@
-from transformerEnFa.logging import logger 
-from transformerEnFa.config.configuration import ConfigurationManager
-from transformerEnFa.components.model_inference import Inference
+from GPT2.logging import logger 
+from GPT2.config.configuration import ConfigurationManager
+from GPT2.components.model_inference import Inference
 
 
 
