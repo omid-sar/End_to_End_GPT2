@@ -99,7 +99,7 @@ class GPT(nn.Module):
         )) 
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
 
-    def forward(self, idx):
+    def forward(self, idx, targets=None):
         B, T = idx.size()
         assert T <= self.config.block_size, f" The forward Sequence length is {T} which CANNOT be longer that block size {self.config.block_size}"
         pos =torch.arange(0, T , dtype=torch.long, device=idx.device)
@@ -111,7 +111,10 @@ class GPT(nn.Module):
             x = block(x)
         x = self.transformer.ln_f(x)
         logits = self.lm_head(x) # (B, T, vocab_size)
-        return logits
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)),targets.view(-1))
+        return logits, loss
 
     @classmethod
     def from_pretrained(cls, model_type):
