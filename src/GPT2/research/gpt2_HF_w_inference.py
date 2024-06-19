@@ -1,4 +1,4 @@
-#%%
+
 from  GPT2.research.gpt2_HF_w_model import GPT, GPTConfig
 from GPT2.utils.model_utils import get_device
 from GPT2.logging import logger
@@ -7,10 +7,11 @@ import torch
 from torch.nn import functional as F
 
 device = get_device()
+torch.manual_seed(1337)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed(1337)
 
-#%%
-# ---------------------- Tokenize with the same sentece to compare HF model weights ------------------------
-
+"""# ---------------------- Tokenize with the same sentece to compare HF model weights ------------------------
 import tiktoken
 
 text = "Hello, I'm a model that can complete sentences. Watch me go!"
@@ -50,26 +51,39 @@ for i in range(num_return_sequences):
     tokens = x[i, :max_lenght].tolist()
     decode = enc.decode(tokens)
     print(f'{"*" * 50} \n {decode}')
+"""
 
-#%%
 # ---------------------- Tokenizing very first tiny_shakespeare and create batch ------------------------
 
-from  transformers import GPT2Tokenizer
+import tiktoken
 
+class DataLoaderLite:
+    def __init__(self, B, T):
+        self.B = B
+        self.T = T
 
-with open ("tiny_shakespeare.txt", "r") as file:
-    text = file.read()
-data = text[:1000]
+        with open ("tiny_shakespeare.txt", "r") as file:
+            text = file.read()
+        enc = tiktoken.get_encoding('gpt2')
+        tokens = enc.encode(text)
+        self.tokens = torch.tensor(tokens, dtype=torch.long)
+        print(f"loaded {len(self.tokens)} tokens")
+        print(f"loaded {len(self.tokens) // (B*T)} batches")
 
+        self.current_position = 0
 
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-tokens = tokenizer.encode(data, return_tensors="pt") # (1, 285)
-B, T = 4, 32
-buf = tokens[:, :B*T + 1]
-buf = buf.to(device)
-x = buf[:,:-1].view(B,T)
-y = buf[:,1:].view(B,T)
-x.shape
+    def next_batch(self):
+        buf = self.tokens[self.current_position : self.current_position+self.B*self.T+1 ]
+        x = buf[:-1].view(self.B, self.T)
+        y = buf[1:].view(self.B, self.T)
+        self.current_position += self.B * self.T
+        if self.current_position > len(self.tokens):
+            self.current_position = 0 
+        return x, y
+    
+
+train_loader = DataLoaderLite( B=4, T=32)
+
 model = GPT(GPTConfig())
 model.to(device)
 
@@ -77,13 +91,16 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
 
 for i in range(50):
     model.train()
-    logits, loss = model(x,y)
+    x, y = train_loader.next_batch()
+    x, y = x.to(device), y.to(device)
     optimizer.zero_grad()
+    logits, loss = model(x,y)
+    
     loss.backward()
     optimizer.step()
     print(f"step {i}, loss: {loss.item()}")
 
-
+import sys; sys.exit(0)
 #%%
 
 # --------------------------------- Generate the next token  --------------------------
