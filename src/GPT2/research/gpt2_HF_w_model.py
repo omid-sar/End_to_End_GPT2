@@ -187,8 +187,3 @@ class GPT(nn.Module):
                     sd[k].copy_(sd_hf[k])
         logger.info(f"Successfully weights loaded from pretrained gpt {model_type}")
         return model
-
-scp /Users/omidsardari/WORK/Becoming a Data Scientist/Python Projects/End_to_End_GPT2 ubuntu@104.171.202.100: ~/.
-
-
-scp -i /Users/omidsardari/WORK/Becoming\ a\ Data\ Scientist/Python\ Projects/End_to_End_GPT2 ubuntu@104.171.202.100:~/
