@@ -112,7 +112,6 @@ class GPT(nn.Module):
 
         self.apply(self._init_weights)
     def _init_weights(self, module):
-        
         if isinstance(module, nn.Linear):
             std = 0.02
             if hasattr(module, "NANOGPT_SCALE_INIT"):
@@ -188,3 +187,8 @@ class GPT(nn.Module):
                     sd[k].copy_(sd_hf[k])
         logger.info(f"Successfully weights loaded from pretrained gpt {model_type}")
         return model
+
+scp /Users/omidsardari/WORK/Becoming a Data Scientist/Python Projects/End_to_End_GPT2 ubuntu@104.171.202.100: ~/.
+
+
+scp -i /Users/omidsardari/WORK/Becoming\ a\ Data\ Scientist/Python\ Projects/End_to_End_GPT2 ubuntu@104.171.202.100:~/
