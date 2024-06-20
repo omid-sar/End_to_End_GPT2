@@ -7,6 +7,38 @@ Overview
 Overview
 Overview
 
+# Connect to Lambda Labs GPU with VSCode SSH
+
+
+## Configure SSH Connection
+1. **Open VSCode Command Palette**: Press `CMD + SHIFT + P`.
+2. **Add NEW HOST**
+```bash
+Host lambda-gpu
+    HostName 104.171.202.100
+    User ubuntu
+    IdentityFile ~/.ssh/id_ed25519
+```
+2. If already create a new host **Edit SSH Config**: Choose `SSH: Open SSH Config` and update the `HostName` with your Lambda Labs instance IP `104.171.202.100`.
+
+## Connect to Your Instance
+- **Connect**: Return to the Command Palette, select `SSH: Connect to Host`, and choose your configured host.
+
+## File Transfer Using SCP
+Transfer files efficiently from your local machine to your Lambda Labs instance using the SCP command:
+
+```bash
+scp -i ~/.ssh/id_ed25519 -r "~/local directory" ubuntu@104.171.202.100:~/
+ ```
+
+ey Details
+
+	•	-i ~/.ssh/id_ed25519: Specifies the SSH private key for authentication.
+	•	-r: Enables recursive copying, necessary for directories.
+	•	”~/local directory”: Your local directory path.
+	•	ubuntu@XXX.XXX.XXX.XXX:~/: Target directory on the remote instance.
+
+Ensure the SSH key permissions are correctly set (chmod 600) to prevent any connection issues.
 
 ## Special Features
 
