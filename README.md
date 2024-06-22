@@ -25,10 +25,10 @@ Host lambda-gpu
 - **Connect**: Return to the Command Palette, select `SSH: Connect to Host`, and choose your configured host.
 
 ## File Transfer Using SCP
-Transfer files efficiently from your local machine to your Lambda Labs instance using the SCP command:
+Transfer files efficiently from your local machine to your Lambda Labs instance using the SCP command, If you navigate to the directory containing the project folder from the terminal:
 
 ```bash
-scp -i ~/.ssh/id_ed25519 -r "~/local directory" ubuntu@104.171.202.100:~/
+scp -i ~/.ssh/id_ed25519 -r ./ ubuntu@104.171.203.119:~/
  ```
 
 ey Details
