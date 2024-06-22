@@ -35,7 +35,6 @@ ey Details
 
 	•	-i ~/.ssh/id_ed25519: Specifies the SSH private key for authentication.
 	•	-r: Enables recursive copying, necessary for directories.
-	•	”~/local directory”: Your local directory path.
 	•	ubuntu@XXX.XXX.XXX.XXX:~/: Target directory on the remote instance.
 
 Ensure the SSH key permissions are correctly set (chmod 600) to prevent any connection issues.
