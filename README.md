@@ -7,6 +7,48 @@ Overview
 Overview
 Overview
 
+
+## Getting Started
+
+### Prerequisites
+- Conda (Miniconda or Anaconda)
+- Python 3.8
+
+### Installation Steps
+1. **Clone the Repository**: 
+   ```bash
+   git clone https://github.com/omid-sar/End_to_End_GPT2.git
+   ```
+    ```bash
+    cd End_to_End_GPT2
+    ```
+2. **Create and Activate a Conda Environment**: 
+
+    ```bash
+    conda env create -f environment.yaml
+    ```
+   ```bash
+   conda activate gpt2
+
+3. **Install the Requirements**: 
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run the Application**: 
+   ```bash
+   python app.py
+   ```
+
+   After running, access the application via your local host and specified port.
+
+## Contact
+- **Author**: Omid Sar
+- **Email**: [mr.omid.sardari@gmail.com](mailto:mr.omid.sardari@gmail.com)
+
+---
+
+
 # Connect to Lambda Labs GPU with VSCode SSH
 
 
@@ -29,6 +71,7 @@ Transfer files efficiently from your local machine to your Lambda Labs instance 
 
 ```bash
 scp -i ~/.ssh/id_ed25519 -r ./ ubuntu@104.171.203.119:~/
+rsync -avz --exclude='.cache/' --exclude='*/cache/' -e "ssh -i ~/.ssh/id_ed25519" ./ ubuntu@104.171.203.119:~/
  ```
 
 ey Details
