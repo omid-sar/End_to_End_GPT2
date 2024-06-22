@@ -1,0 +1,55 @@
+ Python cache files
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# MyPy cache
+.mypy_cache/
+
+# Log and artifacts directories
+artifacts/*
+logs/*
+
+# Sensitive data directories
+access_keys/*
+flagged/*
+
+# Version control systems
+.git/
+.gitignore
+.svn/
+.hg/
+
+# Dependency directories (node_modules, vendor)
+node_modules/
+vendor/
+
+# Environment configs and Docker files
+.env
+.env.example
+Dockerfile
+docker-compose.yml
+*Dockerfile*
+*docker-compose*
+
+# Build and test artifacts
+coverage/
+*.log
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Documentation and config files
+README.md
+LICENSE
+.dockerignore
+.editorconfig
+
+# Temporary and backup files
+*~
+*.bak
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db

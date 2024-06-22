@@ -67,7 +67,7 @@ Host lambda-gpu
 - **Connect**: Return to the Command Palette, select `SSH: Connect to Host`, and choose your configured host.
 
 ## File Transfer Using SCP
-Transfer files efficiently from your local machine to your Lambda Labs instance using the SCP command, If you navigate to the directory containing the project folder from the terminal:
+Transfer files efficiently from your local machine to your Lambda Labs instance using the SCP command, If you navigate to the directory containing the project folder from the terminal, the second of "cache files are excluded":
 
 ```bash
 scp -i ~/.ssh/id_ed25519 -r ./ ubuntu@104.171.203.119:~/
@@ -94,42 +94,6 @@ Ensure the SSH key permissions are correctly set (chmod 600) to prevent any conn
 
 - **Interactive Model Access**: Utilizing Gradio for creating a user-friendly web interface, the project allows easy access to the translation model through a simple interface, enabling users to experience the model's capabilities directly.
 
-
-
-## Getting Started
-
-### Prerequisites
-- Conda (Miniconda or Anaconda)
-- Python 3.8
-
-### Installation Steps
-1. **Clone the Repository**: 
-   ```bash
-   git clone https://github.com/omid-sar/End_to_End_Transformer_En_Fa.git
-   ```
-    ```bash
-    cd End_to_End_Transformer_En_Fa
-    ```
-2. **Create and Activate a Conda Environment**: 
-
-    ```bash
-    conda create -n transformer_pytorch python=3.8 -y
-    ```
-   ```bash
-   conda activate transformer_pytorch
-   ```
-
-3. **Install the Requirements**: 
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Run the Application**: 
-   ```bash
-   python app.py
-   ```
-
-   After running, access the application via your local host and specified port.
 
 ## Contact
 - **Author**: Omid Sar
