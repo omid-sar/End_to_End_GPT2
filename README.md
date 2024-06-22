@@ -25,7 +25,7 @@ Overview
 2. **Create and Activate a Conda Environment**: 
 
     ```bash
-    conda env create -f environment.yaml
+    pip install -r requirements.txt
     ```
    ```bash
    conda activate gpt2
