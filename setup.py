@@ -1,7 +1,12 @@
 import setuptools
 
-with open("README.md", "r", encoding="utf-8") as f:
-    long_description = f.read()
+try:
+    with open("README.md", "r", encoding="utf-8") as fh:
+        long_description = fh.read()
+except FileNotFoundError:
+    long_description = "Long description not available."
+
+
 
 
 __version__ = "0.0.0"
