@@ -73,8 +73,7 @@ Transfer files efficiently from your local machine to your Lambda Labs instance 
 scp -i ~/.ssh/id_ed25519 -r ./ ubuntu@104.171.203.119:~/
 rsync -avz --exclude='.cache/' --exclude='*/cache/' -e "ssh -i ~/.ssh/id_ed25519" ./ ubuntu@104.171.203.119:~/gpt
  ```
-
-ey Details
+ Details
 
 	•	-i ~/.ssh/id_ed25519: Specifies the SSH private key for authentication.
 	•	-r: Enables recursive copying, necessary for directories.
@@ -87,14 +86,13 @@ Ensure the SSH key permissions are correctly set (chmod 600) to prevent any conn
 To streamline your VSCode setup on remote servers through SSH, use the provided script to install essential extensions. Execute these commands in your terminal:
 
 ```bash
-
 # Make the script executable
 chmod +x install_vscode_extensions.sh
 
 # Run the script to install extensions
 ./install_vscode_extensions.sh
 ```
-This version assumes that the script is part of a repository that the user can clone, and provides concise commands for setting up the environment using the script.
+This script ensures that your remote VSCode environment mirrors the robustness of your local setup with necessary extensions pre-installed. Modify install_vscode_extensions.sh directly in the repository to customize which extensions are installed.
 
 
 ## Special Features
