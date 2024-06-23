@@ -82,6 +82,21 @@ ey Details
 
 Ensure the SSH key permissions are correctly set (chmod 600) to prevent any connection issues.
 
+## Setting Up VSCode Extensions via SSH
+
+To streamline your VSCode setup on remote servers through SSH, use the provided script to install essential extensions. Execute these commands in your terminal:
+
+```bash
+
+# Make the script executable
+chmod +x install_vscode_extensions.sh
+
+# Run the script to install extensions
+./install_vscode_extensions.sh
+```
+This version assumes that the script is part of a repository that the user can clone, and provides concise commands for setting up the environment using the script.
+
+
 ## Special Features
 
 - **Transformer Model Implementation**: Built from the ground up based on the influential "Attention is All You Need" paper, this project utilizes PyTorch to create a powerful and efficient translation model.

@@ -3,7 +3,6 @@
 # List of VSCode extensions to install
 declare -a extensions=(
     "amazonwebservices.aws-toolkit-vscode"
-    "ms-vscode-remote.remote-ssh"
     "github.copilot"
     "ms-toolsai.jupyter"
     "ms-python.python"
@@ -12,11 +11,7 @@ declare -a extensions=(
     "ms-python.vscode-pylance"
     "ms-kubernetes-tools.vscode-kubernetes-tools"
     "hashicorp.terraform"
-    "ms-vscode-remote.remote-ssh-edit"
-    "ms-vscode-remote.remote-explorer"
-    "ms-vscode.material-icon-theme"
-    "redhat.vscode-yaml"
-    "equinusocio.vsc-community-material-theme"
+    "ms-vscode.remote-explorer"
     "equinusocio.vsc-material-theme"
     "equinusocio.vsc-material-theme-icons"
 )
