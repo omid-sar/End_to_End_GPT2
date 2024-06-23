@@ -71,7 +71,7 @@ Transfer files efficiently from your local machine to your Lambda Labs instance 
 
 ```bash
 scp -i ~/.ssh/id_ed25519 -r ./ ubuntu@104.171.203.119:~/
-rsync -avz --exclude='.cache/' --exclude='*/cache/' -e "ssh -i ~/.ssh/id_ed25519" ./ ubuntu@104.171.203.119:~/
+rsync -avz --exclude='.cache/' --exclude='*/cache/' -e "ssh -i ~/.ssh/id_ed25519" ./ ubuntu@104.171.203.119:~/gpt
  ```
 
 ey Details
