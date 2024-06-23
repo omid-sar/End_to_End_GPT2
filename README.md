@@ -6,13 +6,10 @@
 Overview
 Overview
 Overview
-
-
 ## Getting Started
 
 ### Prerequisites
-- Conda (Miniconda or Anaconda)
-- Python 3.8
+- Python 3.11
 
 ### Installation Steps
 1. **Clone the Repository**: 
