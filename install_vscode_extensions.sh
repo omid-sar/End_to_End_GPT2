@@ -2,6 +2,7 @@
 
 # List of VSCode extensions to install
 declare -a extensions=(
+    "amazonwebservices.aws-toolkit-vscode"
     "ms-vscode-remote.remote-ssh"
     "github.copilot"
     "ms-toolsai.jupyter"
