@@ -13,7 +13,7 @@ def get_device():
         logger.info("Device name: Apple Metal Performance Shaders (MPS)")
     else:
         logger.info("NOTE: If you have a GPU, consider using it for training.")
-    return torch.device(device)
+    return device
 
 
 def get_weights_file_path(config, epoch):

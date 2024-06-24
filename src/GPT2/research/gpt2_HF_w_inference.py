@@ -4,6 +4,7 @@ from GPT2.utils.model_utils import get_device
 from GPT2.logging import logger
 
 import torch
+import time
 from torch.nn import functional as F
 
 device = get_device()
@@ -82,26 +83,32 @@ class DataLoaderLite:
         return x, y
     
 
-train_loader = DataLoaderLite( B=4, T=32)
+train_loader = DataLoaderLite(B=4, T=1024)
+torch.set_float32_matmul_precision('high')
 
 model = GPT(GPTConfig())
 model.to(device)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
 
-for i in range(50):
-    model.train()
+for i in range(10):
+    t0 = time.time()
     x, y = train_loader.next_batch()
     x, y = x.to(device), y.to(device)
     optimizer.zero_grad()
-    logits, loss = model(x,y)
-    
+    with torch.autocast(device_type=device, dtype=torch.bfloat16):
+        logits, loss = model(x,y)
+        #assert logits.dtype is torch.float16
+    #import code; code.interact(local=locals())
     loss.backward()
     optimizer.step()
-    print(f"step {i}, loss: {loss.item()}")
+    #torch.cuda.synchronize()
+    t1 = time.time()
+    dt = (t1- t0)*1000
+    token_per_sec = (train_loader.B * train_loader.T) / (t1-t0)
+    print(f"step {i}, loss: {loss.item()}, dt: {dt:.2f}ms, tok/sec: {token_per_sec:.2f}")
 
 import sys; sys.exit(0)
-#%%
 
 # --------------------------------- Generate the next token  --------------------------
 torch.manual_seed(42)
