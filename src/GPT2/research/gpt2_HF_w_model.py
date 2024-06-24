@@ -8,7 +8,7 @@ from GPT2.logging import logger
 @dataclass 
 class GPTConfig:
     block_size : int = 1024 # Sequence Length
-    vocab_size: int = 50257
+    vocab_size: int = 50304
     n_layer: int = 12
     n_head: int = 12
     n_embd : int = 768 
@@ -43,12 +43,13 @@ class CausalSelfAttention(nn.Module):
         k = k.view(B, T, self.n_head, d_k).transpose(1, 2)
         v = v.view(B, T, self.n_head, d_k).transpose(1, 2)
 
-        att = q @ k.transpose(-2,-1) * (1.0/ math.sqrt(d_k))
-        att = att.masked_fill(self.bias[:, :, :T, :T] == 0 , float('-inf')) # MASK
-        att = F.softmax(att, dim=-1)
-        #(Batch, n_head, Seq_len, Seq_len) X (Batch, n_head, Seq_len, d_k) = (Batch, n_head, Seq_len, d_k)
-        y = att @ v 
-        # (Batch, n_head, Seq_len, d_k) -> (Batch, Seq_len, n_head, d_k) -> (Batch, Seq_len, embd_dim)
+        # att = q @ k.transpose(-2,-1) * (1.0/ math.sqrt(d_k))
+        # att = att.masked_fill(self.bias[:, :, :T, :T] == 0 , float('-inf')) # MASK
+        # att = F.softmax(att, dim=-1)
+        # #(Batch, n_head, Seq_len, Seq_len) X (Batch, n_head, Seq_len, d_k) = (Batch, n_head, Seq_len, d_k)
+        # y = att @ v 
+        # # (Batch, n_head, Seq_len, d_k) -> (Batch, Seq_len, n_head, d_k) -> (Batch, Seq_len, embd_dim)
+        y = F.scaled_dot_product_attention(q, k , v, is_causal=True)
         y = y.transpose(1,2).contiguous().view(B, T, C)
         y = self.c_proj(y)
         return y 

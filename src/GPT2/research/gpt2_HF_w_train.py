@@ -51,7 +51,10 @@ torch.set_float32_matmul_precision('high')
 
 model = GPT(GPTConfig())
 model.to(device)
-# Adding 
+# Just A100/V100 and above: Make PyTorch code run faster by compiling PyTorch code into optimized kernels Speedup mainly comes from reducing
+# Python overhead and GPU read/writes,second time we run model with torch.compile is significantly slower than the other runs, 
+# although it is much faster than the first run. This is because the "reduce-overhead" mode runs a few warm-up iterations for CUDA graphs.
+#***model = torch.compile(model)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
 
@@ -62,13 +65,13 @@ for i in range(10):
     optimizer.zero_grad()
     # Just A100 and above: Automatic Mixed Precision package. It's just applying 
     # in the forward path and it doesn't apply to all layers, just very selective ones
-    with torch.autocast(device_type=device, dtype=torch.bfloat16):
-        logits, loss = model(x,y)
-        assert logits.dtype is torch.bfloat16
+    #***with torch.autocast(device_type=device, dtype=torch.bfloat16):
+    logits, loss = model(x,y)
+        #***$$assert logits.dtype is torch.bfloat16
     #import code; code.interact(local=locals())
     loss.backward()
     optimizer.step()
-    torch.cuda.synchronize()
+    #***torch.cuda.synchronize()
     t1 = time.time()
     dt = (t1- t0)*1000
     token_per_sec = (train_loader.B * train_loader.T) / (t1-t0)
