@@ -1,4 +1,4 @@
-python==3.11.0
+python
 jupyter
 numpy
 scikit-learn
@@ -11,8 +11,8 @@ torch
 torchvision
 datasets
 tokenizers
-torchmetrics==1.0.3
-tensorboard==2.13.0
+torchmetrics
+tensorboard
 altair
 pyyaml
 python-box
