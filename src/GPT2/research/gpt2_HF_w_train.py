@@ -28,8 +28,8 @@ class DataLoaderLite:
         enc = tiktoken.get_encoding('gpt2')
         tokens = enc.encode(text)
         self.tokens = torch.tensor(tokens, dtype=torch.long)
-        print(f"loaded {len(self.tokens)} tokens")
-        print(f"loaded {len(self.tokens) // (B*T)} batches")
+        logger.info(f"loaded {len(self.tokens)} tokens")
+        logger.info(f"loaded {len(self.tokens) // (B*T)} batches")
 
         self.current_position = 0
 
@@ -72,8 +72,8 @@ def get_lr(it):
     coeff = 0.5 * (1 + math.cos(math.pi * decay_ratio))
     return min_lr + coeff * (max_lr-min_lr)
 
+optimizer = model.configure_optimizer(weight_decay=0.1, learning_rate=6e-4, device_type=device)
 
-optimizer = torch.optim.AdamW(model.parameters(), betas=(0.9, 0.95), eps=1e-8 , lr=3e-4)
 for step in range(max_steps):
     t0 = time.time()
     x, y = train_loader.next_batch()
@@ -99,7 +99,7 @@ for step in range(max_steps):
     t1 = time.time()
     dt = (t1- t0)*1000
     token_per_sec = (train_loader.B * train_loader.T) / (t1-t0)
-    print(f"step {step} | loss: {loss.item():.6f} | lr: {lr:.4f} | norm: {norm:.4f} | dt: {dt:.2f}ms | tok/sec: {token_per_sec:.2f}")
+    logger.info(f"step {step} | loss: {loss.item():.6f} | lr: {lr:.6f} | norm: {norm:.4f} | dt: {dt:.2f}ms | tok/sec: {token_per_sec:.2f}")
 
 import sys; sys.exit(0)
 
