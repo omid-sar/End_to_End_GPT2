@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 import torch
+import inspect
 import math
 import torch.nn as nn
 from torch.nn import functional as F
 from GPT2.logging import logger
-
 
 # ----------- Temporary to load Config localy here not main.py -----
 #from GPT2.config.configuration import ConfigurationManager
@@ -17,7 +17,7 @@ from GPT2.logging import logger
 @dataclass 
 class GPTConfig:
     block_size : int = 1024 # Sequence Length
-    vocab_size: int = 50257
+    vocab_size: int = 50304
     n_layer: int = 12
     n_head: int = 12
     n_embd : int = 768 
@@ -26,14 +26,16 @@ class GPTConfig:
 class CausalSelfAttention(nn.Module):
 
     def __init__(self, config):
-        super().__init__()
+        super(CausalSelfAttention, self).__init__()
         assert config.n_embd % config.n_head == 0, "n_embd is not divisble by n_head" 
         self.n_head = config.n_head
         self.n_embd = config.n_embd
         
-     
         self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
         self.c_proj = nn.Linear(config.n_embd,config.n_embd)
+        # Adding kind of flag to the modules to cancel out standard deviation growth inside the residual
+        # Stearms in each layer (we have two layers in each block: attention and MLP) 
+        self.c_proj.NANOGPT_SCALE_INIT = 1
         # NOT really a 'bias', more of a mask, but following HF naming though
         self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size)).view(1, 1, config.block_size, config.block_size))
 
@@ -50,12 +52,13 @@ class CausalSelfAttention(nn.Module):
         k = k.view(B, T, self.n_head, d_k).transpose(1, 2)
         v = v.view(B, T, self.n_head, d_k).transpose(1, 2)
 
-        att = q @ k.transpose(-2,-1) * (1.0/ math.sqrt(d_k))
-        att = att.masked_fill(self.bias[:, :, :T, :T] == 0 , float('-inf')) # MASK
-        att = F.softmax(att, dim=-1)
-        #(Batch, n_head, Seq_len, Seq_len) X (Batch, n_head, Seq_len, d_k) = (Batch, n_head, Seq_len, d_k)
-        y = att @ v 
-        # (Batch, n_head, Seq_len, d_k) -> (Batch, Seq_len, n_head, d_k) -> (Batch, Seq_len, embd_dim)
+        # att = q @ k.transpose(-2,-1) * (1.0/ math.sqrt(d_k))
+        # att = att.masked_fill(self.bias[:, :, :T, :T] == 0 , float('-inf')) # MASK
+        # att = F.softmax(att, dim=-1)
+        # #(Batch, n_head, Seq_len, Seq_len) X (Batch, n_head, Seq_len, d_k) = (Batch, n_head, Seq_len, d_k)
+        # y = att @ v 
+        # # (Batch, n_head, Seq_len, d_k) -> (Batch, Seq_len, n_head, d_k) -> (Batch, Seq_len, embd_dim)
+        y = F.scaled_dot_product_attention(q, k , v, is_causal=True)
         y = y.transpose(1,2).contiguous().view(B, T, C)
         y = self.c_proj(y)
         return y 
@@ -64,12 +67,15 @@ class CausalSelfAttention(nn.Module):
 class MLP(nn.Module):
 
     def __init__(self, config):
-        super().__init__()
+        super(MLP, self).__init__()
         self.config = config
 
         self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd)
         self.gelu = nn.GELU(approximate='tanh')
         self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd)
+        # Adding kind of flag to the modules to cancel out standard deviation growth inside the residual
+        # Stearms in each layer (we have two layers in each block: attention and MLP) 
+        self.c_proj.NANOGPT_SCALE_INIT = 1
 
     def forward(self, x):
         x = self.c_fc(x)
@@ -81,7 +87,7 @@ class MLP(nn.Module):
 class Block(nn.Module):
 
     def __init__(self, config):
-        super().__init__()
+        super(Block, self).__init__()
         self.config = config
 
         self.ln_1 = nn.LayerNorm(config.n_embd)
@@ -98,7 +104,7 @@ class Block(nn.Module):
 class GPT(nn.Module):
 
     def __init__(self, config):
-        super().__init__()
+        super(GPT, self).__init__()
         self.config = config
 
         self.transformer = nn.ModuleDict(dict(
@@ -109,7 +115,24 @@ class GPT(nn.Module):
         )) 
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
 
-    def forward(self, idx):
+        # Weight sharing scheme 
+        self.transformer.wte.weight = self.lm_head.weight
+
+        # init params
+
+        self.apply(self._init_weights)
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            std = 0.02
+            if hasattr(module, "NANOGPT_SCALE_INIT"):
+                std *= (2 * self.config.n_layer) ** -0.5
+            torch.nn.init.normal_(module.weight, mean=0, std=std)
+            if module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            torch.nn.init.normal_(module.weight, mean=0, std=0.02)
+
+    def forward(self, idx, targets=None):
         B, T = idx.size()
         assert T <= self.config.block_size, f" The forward Sequence length is {T} which CANNOT be longer that block size {self.config.block_size}"
         pos =torch.arange(0, T , dtype=torch.long, device=idx.device)
@@ -121,7 +144,10 @@ class GPT(nn.Module):
             x = block(x)
         x = self.transformer.ln_f(x)
         logits = self.lm_head(x) # (B, T, vocab_size)
-        return logits
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)),targets.view(-1))
+        return logits, loss
 
     @classmethod
     def from_pretrained(cls, model_type):
@@ -171,3 +197,28 @@ class GPT(nn.Module):
                     sd[k].copy_(sd_hf[k])
         logger.info(f"Successfully weights loaded from pretrained gpt {model_type}")
         return model
+    
+    def configure_optimizer(self, weight_decay, learning_rate, device_type):
+        # Start with all of Parameters (that require grad)
+        param_dict = {pn: p for pn, p in self.named_parameters()} # have to change to self
+        param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
+        # Create optim groups. Any parameters that is 2D will be decayed, otherwise No.
+        #  i.e. all weight tensors in matmuls + embeddings decay, all biases and layersnorms Don't
+        decay_params = [p for n, p in param_dict.items() if p.dim() >= 2]
+        nodecay_params = [p for n, p in param_dict.items() if p.dim() < 2 ]
+        optim_groups = [
+            {'params': decay_params, 'weight_decay': weight_decay},
+            {'params': nodecay_params, 'weight_decay': 0}
+        ]
+        num_decay_params = sum(p.numel() for p in decay_params)
+        num_nodecay_params = sum(p.numel() for p in nodecay_params)
+        logger.info(f"Number of decayed parameter tensors: {len(decay_params)}, with {num_decay_params:,} parameters")
+        logger.info(f"Number of Non-decayed parameter tensors: {len(nodecay_params)}, with {num_nodecay_params:,} parameters")
+        # Create AdamW optimizer and use the fused version if it available 
+        fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
+        use_fused = fused_available and device_type == "cuda"
+        logger.info(f"using fused AdamW: {use_fused}")
+
+        optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=(0.9, 0.95), eps=1e-8, fused=use_fused)
+        return optimizer
+

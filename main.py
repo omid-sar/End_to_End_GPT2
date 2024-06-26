@@ -26,7 +26,7 @@ try:
 except Exception as e:
     logger.exception(e)
     raise e 
-
+import sys; sys.exit(0)
 
 STAGE_NAME = "Data Transformation stage"
 try:
