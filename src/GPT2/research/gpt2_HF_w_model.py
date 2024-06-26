@@ -212,35 +212,3 @@ class GPT(nn.Module):
 
         optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=(0.9, 0.95), eps=1e-8, fused=use_fused)
         return optimizer
-
-"""    
-
-model = GPT(GPTConfig())
-weight_decay = []
-
-
-# Start with all of Parameters (that require grad)
-param_dict = {pn: p for pn, p in model.named_parameters()} # have to change to self
-param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
-# Create optim groups. Any parameters that is 2D will be decayed, otherwise No.
-#  i.e. all weight tensors in matmuls + embeddings decay, all biases and layersnorms Don't
-decay_params = [p for n, p in param_dict.items() if p.dim() >= 2]
-nodecay_params = [p for n, p in param_dict.items() if p.dim() < 2 ]
-optim_group = [
-    {'params': decay_params, 'weight_decay': weight_decay},
-    {'params': nodecay_params, 'weight_decay': 0}
-]
-num_decay_params = sum(p.numel() for p in decay_params)
-num_nodecay_params = sum(p.numel() for p in nodecay_params)
-logger.info(f"Number of decayed parameter tensors: {len(decay_params)}, with {num_decay_params:,} parameters")
-logger.info(f"Number of Non-decayed parameter tensors: {len(nodecay_params)}, with {num_nodecay_params:,} parameters")
-# Create AdamW optimizer and use the fused version if it available 
-fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
-use_fused = fused_available and device_type == "cuda"
-logger.info(f"using fused AdamW: {use_fused}")
-
-optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=(0.9, 0.95), eps=1e-8, fused=use_fused)
-
-inspect.signature(torch.optim.AdamW)
-torch.optim.AdamW().pa
-inspect.signature(torch.optim.AdamW).parameters"""

@@ -14,6 +14,13 @@ if torch.cuda.is_available():
     torch.cuda.manual_seed(1337)
 
 
+total_batch_size = 8192 #***524299 # 2^19 based on 124M GPT3 mdoel
+B = 4 # Micro batch size
+T = 1024 # Sequence length
+assert total_batch_size % (B * T) ==0 , "Make sure total_batch_size is divisible by (B * T) "
+grad_accum_step = total_batch_size // (B * T)
+logger.info(f" Total desired batch size: {total_batch_size} => calculated gradient accumulation steps: {grad_accum_step}")
+
 # ---------------------- Tokenizing very first tiny_shakespeare and create batch ------------------------
 
 import tiktoken
@@ -57,8 +64,8 @@ model.to(device)
 #***model = torch.compile(model)
 max_lr = 6e-4
 min_lr =max_lr * 0.1
-warmup_steps = 5
-max_steps = 10
+warmup_steps = 2
+max_steps = 4
 def get_lr(it):
     # 1) linear warmup for warmup_iters steps 
     if it < warmup_steps:
@@ -76,16 +83,20 @@ optimizer = model.configure_optimizer(weight_decay=0.1, learning_rate=6e-4, devi
 
 for step in range(max_steps):
     t0 = time.time()
-    x, y = train_loader.next_batch()
-    x, y = x.to(device), y.to(device)
     optimizer.zero_grad()
-    # Just A100 and above: Automatic Mixed Precision package. It's just applying 
-    # in the forward path and it doesn't apply to all layers, just very selective ones
-    #***with torch.autocast(device_type=device, dtype=torch.bfloat16):
-    logits, loss = model(x,y)
-        #***$$assert logits.dtype is torch.bfloat16
-    #import code; code.interact(local=locals())
-    loss.backward()
+    loss_accum = 0.0
+    for micro_step in range(grad_accum_step):
+        x, y = train_loader.next_batch()
+        x, y = x.to(device), y.to(device)
+        # Just A100 and above: Automatic Mixed Precision package. It's just applying 
+        # in the forward path and it doesn't apply to all layers, just very selective ones
+        #***with torch.autocast(device_type=device, dtype=torch.bfloat16):
+        logits, loss = model(x,y)
+            #***$$assert logits.dtype is torch.bfloat16
+        #import code; code.interact(local=locals())
+        loss = loss / grad_accum_step
+        loss_accum += loss.detach()
+        loss.backward()
     # GLOBAL NORM = 1(computes a single norm over all the gradients of the parameters in the model, not individually for each layer or block)
     #  Clipping by norm preserves the direction of the gradient vector but reduces its magnitude.
     # cliping by norm less likely to interfere with natural convergence (prevent gradient shocks for an abnormal batch of data) of learning algorithms compare value clipping 
@@ -97,9 +108,9 @@ for step in range(max_steps):
     optimizer.step()
     #***torch.cuda.synchronize() # wait for GPU to finish work
     t1 = time.time()
-    dt = (t1- t0)*1000
-    token_per_sec = (train_loader.B * train_loader.T) / (t1-t0)
-    logger.info(f"step {step} | loss: {loss.item():.6f} | lr: {lr:.6f} | norm: {norm:.4f} | dt: {dt:.2f}ms | tok/sec: {token_per_sec:.2f}")
+    dt = (t1- t0)
+    token_per_sec = (train_loader.B * train_loader.T * grad_accum_step) / dt
+    logger.info(f"step {step} | loss: {loss_accum.item():.6f} | lr: {lr:.4e} | norm: {norm:.4f} | dt: {dt:.2f} sec | tok/sec: {token_per_sec:.2f}")
 
 import sys; sys.exit(0)
 
