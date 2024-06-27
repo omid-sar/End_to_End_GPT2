@@ -3,8 +3,8 @@ artifacts_root: artifacts
 
 data_ingestion:
   root_dir: artifacts/data_ingestion
-  dataset_name: "tiny_shakespeare.txt"
-  dataset_url: "https://raw.githubusercontent.com/omid-sar/Project_Data_Hub/main/tiny_shakespeare.txt"
+  dataset_name: "wikitext-2-raw-v1" #"sample-10BT"
+  dataset: "wikitext" #"HuggingFaceFW/fineweb-edu"
   local_data_file: artifacts/data_ingestion/data
 
 data_validation:

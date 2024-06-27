@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
-import requests 
+from datasets import load_dataset 
+
 
 from GPT2.logging import logger
 from GPT2.utils.common import get_size
@@ -15,12 +16,8 @@ class DataIngestion:
         file_path = Path(os.path.join(self.config.local_data_file, self.config.dataset_name))
         if not file_path.exists():
             os.makedirs(self.config.local_data_file, exist_ok=True)
-            response = requests.get(self.config.dataset_url, stream=True)
-            with open(str(file_path), "wb") as file:
-                file.write(response.content)
+            data = load_dataset(self.config.dataset, name=self.config.dataset_name, split="train", cache_dir=str(file_path))
             logger.info(f"{self.config.dataset_name} downloaded!")
         else:
             logger.info(f"Dataset already exists at {self.config.local_data_file}. Size: {get_size(file_path)}")
-
-
 
