@@ -10,6 +10,14 @@ class DataIngestionConfig:
     local_data_file: Path
 
 @dataclass(frozen=True)
+class DataPreprocessingConfig:
+    root_dir: Path
+    dataset_name: str
+    dataset: str
+    local_data_file: Path
+    shard_size: int
+
+@dataclass(frozen=True)
 class DataValidationConfig:
     root_dir: Path
     STATUS_FILE: str

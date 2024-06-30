@@ -1,12 +1,8 @@
 from GPT2.constants import *
 from GPT2.utils.common import read_yaml, create_directories
-from GPT2.entity import DataIngestionConfig
-from GPT2.entity import DataValidationConfig
-from GPT2.entity import DataTransformationConfig
-from GPT2.entity import GPTConfig
-from GPT2.entity import ModelTrainingConfig
-from GPT2.entity import ModelEvaluationConfig
-from GPT2.entity import ModelInferenceConfig
+from GPT2.entity import DataIngestionConfig, DataPreprocessingConfig, DataValidationConfig, DataTransformationConfig
+from GPT2.entity import GPTConfig, ModelTrainingConfig, ModelEvaluationConfig, ModelInferenceConfig
+
 
 class ConfigurationManager:
     def __init__(
@@ -31,6 +27,20 @@ class ConfigurationManager:
 
         return data_ingestion_config
     
+    def get_data_preprocessing_config(self) -> DataPreprocessingConfig:
+        config = self.config.data_preprocessing
+
+        create_directories([config.root_dir])
+
+        data_preprocessing_config = DataPreprocessingConfig(
+            root_dir = config.root_dir,
+            dataset_name = config.dataset_name,
+            dataset = config.dataset,
+            local_data_file = config.local_data_file,
+            shard_size = config.shard_size
+        )
+
+        return data_preprocessing_config
 
     def get_data_validation_config(self)-> DataValidationConfig:
         config = self.config.data_validation
