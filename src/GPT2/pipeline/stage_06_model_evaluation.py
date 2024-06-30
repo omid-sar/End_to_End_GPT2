@@ -2,7 +2,7 @@ from GPT2.logging import logger
 from GPT2.config.configuration import ConfigurationManager
 from GPT2.utils.model_utils import get_device, latest_weights_file_path
 from GPT2.components.model_evaluation import run_validation
-from GPT2.components.data_transformation import get_ds
+from GPT2.components.data_transformation1 import get_ds
 from GPT2.models.transformer import built_transformer
 
 

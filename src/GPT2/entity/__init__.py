@@ -10,21 +10,23 @@ class DataIngestionConfig:
     local_data_file: Path
 
 @dataclass(frozen=True)
-class DataPreprocessingConfig:
+class DataValidationConfig:
+    root_dir: Path
+    STATUS_FILE: str
+    ALL_REQUIRED_FILES: list 
+    
+@dataclass(frozen=True)
+class DataTransformationConfig:
     root_dir: Path
     dataset_name: str
     dataset: str
     local_data_file: Path
     shard_size: int
 
-@dataclass(frozen=True)
-class DataValidationConfig:
-    root_dir: Path
-    STATUS_FILE: str
-    ALL_REQUIRED_FILES: list 
+
 
 @dataclass(frozen=True)
-class DataTransformationConfig:
+class DataTransformationConfig1:
     root_dir: Path
     tokenizer_file: Path
     local_data_file: Path

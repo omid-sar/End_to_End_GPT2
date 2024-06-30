@@ -7,19 +7,21 @@ data_ingestion:
   dataset: "wikitext" #"HuggingFaceFW/fineweb-edu"
   local_data_file: artifacts/data_ingestion/data
 
-data_preprocessing:
-  root_dir: artifacts/data_preprocessing
-  dataset_name: "wikitext-2-raw-v1" #"sample-10BT"
-  dataset: "wikitext" #"HuggingFaceFW/fineweb-edu"
-  local_data_file: artifacts/data_preprocessing/data
-  shard_size: (1e6) # small shard size for toy "wikitext" dataset
-
 data_validation:
   root_dir: artifacts/data_validation
   STATUS_FILE: artifacts/data_validation/status.txt
   ALL_REQUIRED_FILES: ["tiny_shakespeare.txt"] # should modify since 4 files saved 
-
+  
 data_transformation:
+  root_dir: artifacts/data_transformation
+  dataset_name: "wikitext-2-raw-v1" #"sample-10BT"
+  dataset: "wikitext" #"HuggingFaceFW/fineweb-edu"
+  local_data_file: artifacts/data_transformation/data
+  shard_size: (1e6) # small shard size for toy "wikitext" dataset
+
+
+
+data_transformation1:
   root_dir: artifacts/data_transformation
   tokenizer_file: artifacts/data_transformation/tokenizer_{0}.json
   local_data_file: artifacts/data_ingestion/data 

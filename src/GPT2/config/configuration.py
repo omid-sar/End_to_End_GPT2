@@ -1,6 +1,6 @@
 from GPT2.constants import *
 from GPT2.utils.common import read_yaml, create_directories
-from GPT2.entity import DataIngestionConfig, DataPreprocessingConfig, DataValidationConfig, DataTransformationConfig
+from GPT2.entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig
 from GPT2.entity import GPTConfig, ModelTrainingConfig, ModelEvaluationConfig, ModelInferenceConfig
 
 
@@ -27,21 +27,6 @@ class ConfigurationManager:
 
         return data_ingestion_config
     
-    def get_data_preprocessing_config(self) -> DataPreprocessingConfig:
-        config = self.config.data_preprocessing
-
-        create_directories([config.root_dir])
-
-        data_preprocessing_config = DataPreprocessingConfig(
-            root_dir = config.root_dir,
-            dataset_name = config.dataset_name,
-            dataset = config.dataset,
-            local_data_file = config.local_data_file,
-            shard_size = config.shard_size
-        )
-
-        return data_preprocessing_config
-
     def get_data_validation_config(self)-> DataValidationConfig:
         config = self.config.data_validation
 
@@ -55,8 +40,23 @@ class ConfigurationManager:
 
         return data_validation_config
     
-
     def get_data_transformation_config(self) -> DataTransformationConfig:
+        config = self.config.data_transformation
+
+        create_directories([config.root_dir])
+
+        data_transformation_config = DataTransformationConfig(
+            root_dir = config.root_dir,
+            dataset_name = config.dataset_name,
+            dataset = config.dataset,
+            local_data_file = config.local_data_file,
+            shard_size = config.shard_size
+        )
+
+        return data_transformation_config
+
+
+    def get_data_transformation_config1(self) -> DataTransformationConfig:
         config = self.config.data_transformation
 
         create_directories([config.root_dir])
