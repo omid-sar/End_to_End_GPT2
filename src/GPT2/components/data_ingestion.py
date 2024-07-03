@@ -4,7 +4,7 @@ from datasets import load_dataset
 
 
 from GPT2.logging import logger
-from GPT2.utils.common import get_size
+from GPT2.utils.common import get_size, create_directories
 from GPT2.entity import DataIngestionConfig
 
 

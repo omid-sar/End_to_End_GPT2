@@ -11,13 +11,14 @@ data_validation:
   root_dir: artifacts/data_validation
   STATUS_FILE: artifacts/data_validation/status.txt
   ALL_REQUIRED_FILES: ["tiny_shakespeare.txt"] # should modify since 4 files saved 
-  
+
 data_transformation:
   root_dir: artifacts/data_transformation
   dataset_name: "wikitext-2-raw-v1" #"sample-10BT"
   dataset: "wikitext" #"HuggingFaceFW/fineweb-edu"
+  downloaded_files: artifacts/data_ingestion/data
   local_data_file: artifacts/data_transformation/data
-  shard_size: (1e6) # small shard size for toy "wikitext" dataset
+  shard_size: 1000000 # small shard size for toy "wikitext" dataset
 
 
 

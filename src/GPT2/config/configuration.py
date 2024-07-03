@@ -49,6 +49,7 @@ class ConfigurationManager:
             root_dir = config.root_dir,
             dataset_name = config.dataset_name,
             dataset = config.dataset,
+            downloaded_files  = config.downloaded_files, 
             local_data_file = config.local_data_file,
             shard_size = config.shard_size
         )

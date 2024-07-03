@@ -12,17 +12,3 @@ class DataTransformationTrainingPipeline():
         data_transformation_config = config.get_data_transformation_config()
         tokenizer = DataTokenizer(config=data_transformation_config)
 
-        if tokenizer.check_existing_tokenized_data():
-            # 
-            # ADDING THE NUMBER OF SHARDED FILE ALREADY EXIST
-            # 
-            logger.info(f"Tokenized data is available. Proceeding with further processing.")
-        else:
-            logger.info(f"No tokenized data found. Starting tokenization process.")
-            tokenizer.process_documents()
-            # 
-            # ADDING THE NUMBER OF SHARDED FILE ALREADY EXIST
-            # 
-            logger.info(f"Tokenization completed.")
-            
-
