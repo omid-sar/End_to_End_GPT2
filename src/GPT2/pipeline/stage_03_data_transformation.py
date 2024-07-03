@@ -11,4 +11,5 @@ class DataTransformationTrainingPipeline():
         config = ConfigurationManager()
         data_transformation_config = config.get_data_transformation_config()
         tokenizer = DataTokenizer(config=data_transformation_config)
+        tokenizer.process_documents()
 

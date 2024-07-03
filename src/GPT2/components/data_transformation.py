@@ -88,14 +88,36 @@ class DataTokenizer:
                     progress_bar.update(len(tokens))
                 else:
                     split = "val" if shard_index == 0 else "train"
-                    filename = os.path.join(self.transformed_file_path, f"edufineweb_{split}_{shard_index:06d}")
+                    file_name = os.path.join(self.transformed_file_path, f"edufineweb_{split}_{shard_index:06d}")
+                    reminder = self.config.shard_size - token_count
+                    progress_bar.update(len(reminder))
+                    all_tokens_np[token_count : token_count + reminder] = tokens[:reminder]
+                    self.write_datafile(file_name, all_tokens_np)
+                    shard_index += 1
+                    progress_bar = None
+                    all_tokens_np[0 : len(tokens) - reminder] = tokens[reminder:]
+                    token_count = len(tokens) - reminder
+
+            if token_count !=0:
+                split = "val" if shard_index == 0 else "train"
+                file_name = os.path.join(self.transformed_file_path, f"edufineweb_{split}_{shard_index:06d}")
+                self.write_datafile(file_name, all_tokens_np)
 
 
 
-# -----------------------
-from GPT2.config.configuration import ConfigurationManager
-import os; os.chdir("../../..")
-config = ConfigurationManager()
-data_transformation_config = config.get_data_transformation_config()
-tokenizer = DataTokenizer(config=data_transformation_config)
-tokenizer.process_documents()
+
+
+
+#-----------------------
+if __name__ == '__main__':
+    from GPT2.config.configuration import ConfigurationManager
+    import os; os.chdir("../../..")
+    config = ConfigurationManager()
+    data_transformation_config = config.get_data_transformation_config()
+    tokenizer = DataTokenizer(config=data_transformation_config)
+    tokenizer.process_documents()
+
+# from datasets import load_dataset    
+# dataset = load_dataset("HuggingFaceFW/fineweb-edu", name="sample-10BT", cache_dir="artifacts/data_ingestion/data/sample-10BT")
+
+# dataset = load_dataset("wikitext-2-raw-v1", name="wikitext")
