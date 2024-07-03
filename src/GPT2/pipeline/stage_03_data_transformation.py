@@ -12,7 +12,7 @@ class DataTransformationTrainingPipeline():
         data_transformation_config = config.get_data_transformation_config()
         tokenizer = DataTokenizer(config=data_transformation_config)
 
-        if tokenizer.check_existing_data():
+        if tokenizer.check_existing_tokenized_data():
             # 
             # ADDING THE NUMBER OF SHARDED FILE ALREADY EXIST
             # 

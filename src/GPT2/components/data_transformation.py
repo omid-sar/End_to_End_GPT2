@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from datasets import load_dataset 
+import tiktoken
 
 
 from GPT2.logging import logger
@@ -19,6 +20,15 @@ class DataTokenizer:
                 return None
         else:
             logger.warning(f"No cached data found at {file_path}. Consider downloading it first.")
+        
+        self.enc = tiktoken.get_encoding('gpt2')
+        self.eot = self.enc._special_tokens['<|endoftext|>'] # end of text token
+
+    
+    def check_existing_tokenized_data(self):
+        
+
+
 
 
 
