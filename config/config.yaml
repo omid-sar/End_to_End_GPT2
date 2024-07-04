@@ -1,6 +1,5 @@
 artifacts_root: artifacts
 
-
 data_ingestion:
   root_dir: artifacts/data_ingestion
   dataset_name: "wikitext-2-raw-v1" #***"sample-10BT"
@@ -14,7 +13,6 @@ data_transformation:
   downloaded_files: artifacts/data_ingestion/data
   local_data_file: artifacts/data_transformation/data
   shard_size: 1000000 #*** 100000000 small shard size for toy "wikitext" dataset
-
 
 gpt_config:
   root_dir: artifacts/model_config
