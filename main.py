@@ -1,7 +1,6 @@
 from GPT2.logging import logger 
 from GPT2.pipeline.stage_01_data_ingestion import DataIngestionTrainingPipeline
-from GPT2.pipeline.stage_03_data_transformation import DataTransformationTrainingPipeline
-from GPT2.pipeline.stage_02_data_validation import DataValidationTrainingPipeline
+from GPT2.pipeline.stage_02_data_transformation import DataTransformationTrainingPipeline
 #from GPT2.pipeline.stage_03_data_transformation import DataTransformationTrainingPipeline
 #from GPT2.pipeline.stage_03_model_verification import ModelVerificationTrainingPipeline
 #from GPT2.pipeline.stage_04_model_training import ModelTrainingPipeline
@@ -18,21 +17,11 @@ except Exception as e:
         logger.exception(e)
         raise e
 
-# STAGE_NAME = "Data Validation stage"
-# try:
-#     logger.info(f"\n\nx{'=' * 80}x \n\n>>>>>> stage {STAGE_NAME} started <<<<<<")
-#     data_validation = DataValidationTrainingPipeline()
-#     data_validation.main()
-#     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx{'=' * 80}x")
-# except Exception as e:
-#     logger.exception(e)
-#     raise e 
-
 STAGE_NAME = "Data Transformation stage"
 try:
     logger.info(f"\n\nx{'=' * 80}x \n\n>>>>>> stage {STAGE_NAME} started <<<<<<")
     data_transformation = DataTransformationTrainingPipeline()
-    data_transformation.main()
+    data_transformation.main(use_multiprocessing=False) #*** should be True
     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx{'=' * 80}x")
 except Exception as e:
     logger.exception(e)
