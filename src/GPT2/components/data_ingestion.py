@@ -4,7 +4,7 @@ from datasets import load_dataset
 
 
 from GPT2.logging import logger
-from GPT2.utils.common import get_size, create_directories
+from GPT2.utils.common import  get_directory_size
 from GPT2.entity import DataIngestionConfig
 
 
@@ -19,5 +19,5 @@ class DataIngestion:
             data = load_dataset(self.config.dataset, name=self.config.dataset_name, split="train", cache_dir=str(file_path))
             logger.info(f"{self.config.dataset_name} downloaded!")
         else:
-            logger.info(f"Dataset already exists at {self.config.local_data_file}. Size: {get_size(file_path)}")
+            logger.info(f"Dataset already exists at {self.config.local_data_file}. Size: {get_directory_size(file_path)}")
 

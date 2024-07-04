@@ -6,9 +6,9 @@ from datasets import load_dataset, load_from_disk
 from GPT2.logging import logger
 from GPT2.utils.model_utils import get_device, latest_weights_file_path
 from GPT2.config.configuration import ConfigurationManager
-from GPT2.components.data_transformation1 import get_or_build_tokenizer
+from GPT2.components.data_transformation import get_or_build_tokenizer
 from GPT2.models.transformer import built_transformer
-from GPT2.components.data_transformation1 import BilingualDataset
+from GPT2.components.data_transformation import BilingualDataset
 
 from  GPT2.research.gpt2_HF_w_model import GPT, GPTConfig
 from GPT2.utils.model_utils import get_device

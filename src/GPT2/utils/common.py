@@ -52,6 +52,23 @@ def create_directories(path_to_directories: list, verbose=True):
 
 
 @ensure_annotations
+def get_directory_size(path: Path) -> str:
+    try:
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk(path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                total_size += os.path.getsize(fp)
+        size_in_kb = round(total_size / 1024)
+        return f"~ {size_in_kb} KB"
+    except FileNotFoundError:
+        return "Directory not found"
+    except PermissionError:
+        return "Permission denied"
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
+@ensure_annotations
 def get_size(path: Path) -> str:
     """get size in KB
 

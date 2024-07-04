@@ -98,6 +98,6 @@ def main():
     tokenizer = DataTokenizer(config=config)
     tokenizer.process_documents()
 
-if __name__ == '__main__':
-    mp.freeze_support()
-    main()
+#if __name__ == '__main__':
+    #mp.freeze_support()
+main()
