@@ -5,10 +5,12 @@ import tiktoken
 from datasets import load_dataset
 from tqdm import tqdm
 from pathlib import Path
+import torch
 
 from GPT2.logging import logger
 from GPT2.entity import DataTransformationConfig
 from GPT2.utils.common import  get_directory_size
+import tiktoken
 
 class DataTokenizer:
     def __init__(self, config:DataTransformationConfig ):
@@ -120,4 +122,28 @@ def process_documents_parallel(tokenizer):
             filename = os.path.join(tokenizer.transformed_file_path, f"edufineweb_{split}_{shard_index:06d}")
             tokenizer.write_datafile(filename, all_tokens_np[:token_count])
 
+
+class DataLoaderLite:
+    def __init__(self, config):
+        self.B = config.B
+        self.T = config.T
+
+        with open ("tiny_shakespeare.txt", "r") as file:
+            text = file.read()
+        enc = tiktoken.get_encoding('gpt2')
+        tokens = enc.encode(text)
+        self.tokens = torch.tensor(tokens, dtype=torch.long)
+        logger.info(f"loaded {len(self.tokens)} tokens")
+        logger.info(f"loaded {len(self.tokens) // (self.B*self.T)} batches")
+
+        self.current_position = 0
+
+    def next_batch(self):
+        buf = self.tokens[self.current_position : self.current_position+self.B*self.T+1 ]
+        x = buf[:-1].view(self.B, self.T)
+        y = buf[1:].view(self.B, self.T)
+        self.current_position += self.B * self.T
+        if self.current_position > len(self.tokens):
+            self.current_position = 0 
+        return x, y
 

@@ -1,6 +1,6 @@
 from GPT2.logging import logger 
 from GPT2.config.configuration import ConfigurationManager
-from GPT2.components.data_transformation import DataTokenizer, process_documents_parallel
+from GPT2.components.data_transformation import DataTokenizer, process_documents_parallel, DataLoaderLite
 
 
 class DataTransformationTrainingPipeline():
@@ -12,14 +12,17 @@ class DataTransformationTrainingPipeline():
             config = ConfigurationManager()
             data_transformation_config = config.get_data_transformation_config()
             tokenizer = DataTokenizer(config=data_transformation_config)
-
+            train_loader = DataLoaderLite(config=data_transformation_config)
+        
             logger.info(f"Starting data transformation with multiprocessing={'enabled' if use_multiprocessing else 'disabled'}")
             
             if use_multiprocessing:
                 process_documents_parallel(tokenizer)
             else:
                 tokenizer.process_documents_sequential()
+            return train_loader
         
         except Exception as e:
             logger.error(f"An error occurred during data transformation: {str(e)}")
             raise
+        

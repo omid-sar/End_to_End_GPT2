@@ -23,19 +23,10 @@ class DataTransformationConfig:
     downloaded_files: Path
     local_data_file: Path
     shard_size: int
+    total_batch_size: int
+    B: int
+    T: int
 
-
-
-@dataclass(frozen=True)
-class DataTransformationConfig1:
-    root_dir: Path
-    tokenizer_file: Path
-    local_data_file: Path
-    lang_src: str
-    lang_tgt: str
-    seq_len: int
-    batch_size: int
-    train_val_split_ratio: Tuple[float, float]  
 
 @dataclass(frozen=True)
 class GPTConfig:
@@ -43,13 +34,13 @@ class GPTConfig:
     verification_info_dir: Path
     verification_summary_file: Path
     verification_weights_file: Path
-    src_seq_len: int
-    tgt_seq_len: int
-    d_model: int
-    N: int
-    h: int
-    dropout: float
-    d_ff: int
+    block_size : int
+    vocab_size: int
+    n_layer: int
+    n_head: int
+    n_embd : int
+    weight_decay: float
+    learning_rate: float
 
 @dataclass(frozen=True)
 class ModelTrainingConfig:

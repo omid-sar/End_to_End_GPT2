@@ -1,60 +1,37 @@
 import torch
-from pathlib import Path
-from GPT2.utils.common import  create_directories
 from GPT2.utils.model_utils import get_device
-from GPT2.models.transformer import built_transformer
 from GPT2.config.configuration import ConfigurationManager
-from GPT2.utils.model_utils import save_model_summary, save_initial_weights
+
 from GPT2.logging import logger
 
+from GPT2.models.gpt2_model import GPT
+
+
 class ModelVerificationTrainingPipeline:
-    def __init__(self, tokenizer_src, tokenizer_tgt):
-
-        self.tokenizer_src = tokenizer_src
-        self.tokenizer_tgt = tokenizer_tgt
-        self.src_vocab_size = tokenizer_src.get_vocab_size()
-        self.tgt_vocab_size = tokenizer_tgt.get_vocab_size()
-
-        self.config_manager = ConfigurationManager()
-        self.config = self.config_manager.get_model_config()
-        self.device = get_device()
-       
-
+    def __init__(self) -> None:
+        pass
 
     def main(self):
         try:
-            # Instantiate the model to check for syntax errors in initialization
-            model = built_transformer(
-                src_vocab_size=self.src_vocab_size,
-                tgt_vocab_size=self.tgt_vocab_size,
-                src_seq_len=self.config.src_seq_len,
-                tgt_seq_len=self.config.tgt_seq_len,
-                d_model=self.config.d_model,
-                N=self.config.N,
-                h=self.config.h,
-                dropout=self.config.dropout,
-                d_ff=self.config.d_ff
-            ).to(self.device)
-            logger.info("Model instantiation successful.")
-            create_directories([self.config.verification_info_dir])
+            config_manager = ConfigurationManager()
             
+            config = config_manager.get_gpt_config()
+            device = get_device()
+            model = GPT(config=config)
+            model.to(device)
+            optimizer = model.configure_optimizer(weight_decay=config.weight_decay, learning_rate=config.learning_rate, device_type=device)
+
             # Optionally, perform a simple forward pass check
-            # dummy_input = torch.rand(1, self.config.src_seq_len).long().to(self.device)
-            # with torch.no_grad():
-            #     _ = model(dummy_input)
-            # logger.info("Basic forward pass successful.")
+            dummy_config = config_manager.get_data_transformation_config()
+            dummy_input = torch.randint(0, config.vocab_size, (dummy_config.B, dummy_config.T)).to(device)
+            with torch.no_grad():
+                logits, _ = model(dummy_input)
+            assert logits.size() == (dummy_config.B, dummy_config.T, config.vocab_size) , f"Model size failed"
+            logger.info("Basic forward pass successful.")
+
+            return model, optimizer
 
         except Exception as e:
             logger.error(f"Model verification failed: {e}")
             raise e
 
-        # Save model summary and initial weights as before
-        save_model_summary(
-            model,
-            Path(self.config.verification_info_dir) / self.config.verification_summary_file,
-            input_size=(self.config.src_seq_len,),
-            device=str(self.device)
-        )
-        logger.info("Model and device setup complete.")
-        return model
-    

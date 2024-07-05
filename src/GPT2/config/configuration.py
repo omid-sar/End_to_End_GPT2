@@ -27,18 +27,7 @@ class ConfigurationManager:
 
         return data_ingestion_config
     
-    def get_data_validation_config(self)-> DataValidationConfig:
-        config = self.config.data_validation
 
-        create_directories([config.root_dir])
-
-        data_validation_config = DataValidationConfig(
-        root_dir = config.root_dir,
-        STATUS_FILE = config.STATUS_FILE,
-        ALL_REQUIRED_FILES= config.ALL_REQUIRED_FILES
-        )
-
-        return data_validation_config
     
     def get_data_transformation_config(self) -> DataTransformationConfig:
         config = self.config.data_transformation
@@ -51,27 +40,14 @@ class ConfigurationManager:
             dataset = config.dataset,
             downloaded_files  = config.downloaded_files, 
             local_data_file = config.local_data_file,
-            shard_size = config.shard_size
+            shard_size = config.shard_size,
+            total_batch_size = config.total_batch_size,
+            B = config.B,
+            T = config.T,
         )
 
         return data_transformation_config
 
-
-    def get_data_transformation_config1(self) -> DataTransformationConfig:
-        config = self.config.data_transformation
-
-        create_directories([config.root_dir])
-
-        return DataTransformationConfig(
-            root_dir = config.root_dir,
-            tokenizer_file = config.tokenizer_file,
-            local_data_file = config.local_data_file,
-            lang_src = config.lang_src,
-            lang_tgt = config.lang_tgt,
-            seq_len = config.seq_len,
-            batch_size = config.batch_size,
-            train_val_split_ratio = tuple(config.train_val_split_ratio),
-        )
 
     def get_gpt_config(self) -> GPTConfig:
         config = self.config.gpt_config
@@ -85,13 +61,13 @@ class ConfigurationManager:
             verification_info_dir = config.verification_info_dir,
             verification_summary_file = config.verification_summary_file, 
             verification_weights_file = config.verification_weights_file, 
-            src_seq_len = config.src_seq_len,
-            tgt_seq_len = config.tgt_seq_len,
-            d_model = config.d_model,
-            N = config.N,
-            h = config.h,
-            dropout = config.dropout,
-            d_ff = config.d_ff
+            block_size = config.block_size,
+            vocab_size = config.vocab_size,
+            n_layer = config.n_layer,
+            n_head = config.n_head,
+            n_embd = config.n_embd,
+            weight_decay = config.weight_decay,
+            learning_rate = config.learning_rate,
         )
 
     def get_model_training_config(self) -> ModelTrainingConfig:

@@ -6,22 +6,6 @@ import torch.nn as nn
 from torch.nn import functional as F
 from GPT2.logging import logger
 
-# ----------- Temporary to load Config localy here not main.py -----
-#from GPT2.config.configuration import ConfigurationManager
-#import os
-#os.getcwd()
-#os.chdir('../../../')
-#config = ConfigurationManager()
-# -------------------------------------------------------------------
-
-@dataclass 
-class GPTConfig:
-    block_size : int = 1024 # Sequence Length
-    vocab_size: int = 50304
-    n_layer: int = 12
-    n_head: int = 12
-    n_embd : int = 768 
-
 
 class CausalSelfAttention(nn.Module):
 
