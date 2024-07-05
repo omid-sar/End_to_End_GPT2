@@ -30,8 +30,6 @@ gpt_config:
   weight_decay: 0.1
   learning_rate: 0.0006
   
-
-
 model_training:
   root_dir: artifacts/model_training
   model_folder: artifacts/model_training/gpt2_weights
