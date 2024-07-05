@@ -34,13 +34,14 @@ gpt_config:
 
 model_training:
   root_dir: artifacts/model_training
-  model_folder: artifacts/model_training/model_en_fa_weights
-  model_basename: "tmodel_"
-  tensorboard_log_dir: logs
-  lr: 0.0001
-  max_len: 50
-  preload:
-  num_epochs: 1 
+  model_folder: artifacts/model_training/gpt2_weights
+  total_batch_size: 8192 #***524299 # 2^19 based on 124M GPT3 mdoel
+  B: 4 # Micro batch size #***64
+  T: 1024 # Sequence length
+  max_lr: 0.0006
+  min_lr: 0.00006 #max_lr * 0.1
+  warmup_steps: 2
+  max_steps: 4
 
 model_evaluation:
   root_dir: artifacts/model_evaluation

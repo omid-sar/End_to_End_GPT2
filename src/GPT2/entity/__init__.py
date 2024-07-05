@@ -46,12 +46,13 @@ class GPTConfig:
 class ModelTrainingConfig:
     root_dir: Path
     model_folder: Path
-    model_basename: str
-    tensorboard_log_dir: Path
-    lr: float
-    max_len: int
-    preload: str
-    num_epochs: int
+    total_batch_size: int
+    B: int
+    T: int
+    max_lr: float
+    min_lr: float
+    warmup_steps: int
+    max_steps: int
 
 @dataclass(frozen=True)
 class ModelEvaluationConfig:

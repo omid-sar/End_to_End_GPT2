@@ -1,9 +1,7 @@
 import torch
 from GPT2.utils.model_utils import get_device
 from GPT2.config.configuration import ConfigurationManager
-
 from GPT2.logging import logger
-
 from GPT2.models.gpt2_model import GPT
 
 

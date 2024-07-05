@@ -78,13 +78,13 @@ class ConfigurationManager:
         model_training_config = ModelTrainingConfig(
             root_dir = config.root_dir,
             model_folder = config.model_folder,
-            model_basename = config.model_basename,
-            tensorboard_log_dir = config.tensorboard_log_dir,
-            lr = config.lr, 
-            max_len = config.max_len,
-            preload = config.preload,
-            num_epochs = config.num_epochs,
-            
+            total_batch_size = config.total_batch_size,
+            B = config.B,
+            T = config.T,
+            max_lr = config.max_lr,
+            min_lr = config.min_lr,
+            warmup_steps = config.warmup_steps,
+            max_steps = config.max_steps,
         )
 
         return model_training_config
