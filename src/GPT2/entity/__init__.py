@@ -41,6 +41,7 @@ class GPTConfig:
     n_embd : int
     weight_decay: float
     learning_rate: float
+    betas: Tuple[float, float]
 
 @dataclass(frozen=True)
 class ModelTrainingConfig:

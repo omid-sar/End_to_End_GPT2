@@ -26,6 +26,7 @@ def train_model(config, train_loader, model, optimizer):
     # Just A100/V100 and above: Make PyTorch code run faster by compiling PyTorch code into optimized kernels Speedup mainly comes from reducing
     # Python overhead and GPU read/writes,second time we run model with torch.compile is significantly slower than the other runs, 
     # although it is much faster than the first run. This is because the "reduce-overhead" mode runs a few warm-up iterations for CUDA graphs.
+    # and it doesn't work right now on "MPS"
     #***model = torch.compile(model)
 
     def get_lr(it):
@@ -57,9 +58,10 @@ def train_model(config, train_loader, model, optimizer):
             loss = loss / grad_accum_step
             loss_accum += loss.detach()
             loss.backward()
-        # GLOBAL NORM = 1(computes a single norm over all the gradients of the parameters in the model, not individually for each layer or block)
-        #  Clipping by norm preserves the direction of the gradient vector but reduces its magnitude.
-        # cliping by norm less likely to interfere with natural convergence (prevent gradient shocks for an abnormal batch of data) of learning algorithms compare value clipping 
+        # GLOBAL NORM = 1(computes a single norm over all the gradients of the parameters in the model, 
+        # not individually for each layer or block. Clipping by norm preserves the direction of the gradient vector 
+        # but reduces its magnitude. cliping by norm less likely to interfere with natural convergence 
+        # (prevent gradient shocks for an abnormal batch of data) of learning algorithms compare value clipping 
         norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
         # determine and set the learning rate for this iteration
         lr =get_lr(step)
@@ -71,6 +73,5 @@ def train_model(config, train_loader, model, optimizer):
         dt = (t1- t0)
         token_per_sec = (config.B * config.T * grad_accum_step) / dt
         logger.info(f"step {step} | loss: {loss_accum.item():.6f} | lr: {lr:.4e} | norm: {norm:.4f} | dt: {dt:.2f} sec | tok/sec: {token_per_sec:.2f}")
-
 
 

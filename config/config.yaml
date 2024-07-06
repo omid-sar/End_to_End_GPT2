@@ -29,6 +29,7 @@ gpt_config:
   n_embd : 768 
   weight_decay: 0.1
   learning_rate: 0.0006
+  betas: [0.9, 0.95]
   
 model_training:
   root_dir: artifacts/model_training
@@ -39,7 +40,7 @@ model_training:
   max_lr: 0.0006
   min_lr: 0.00006 #max_lr * 0.1
   warmup_steps: 2
-  max_steps: 4
+  max_steps: 4 #***
 
 model_evaluation:
   root_dir: artifacts/model_evaluation

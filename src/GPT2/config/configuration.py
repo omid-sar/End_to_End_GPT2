@@ -68,6 +68,7 @@ class ConfigurationManager:
             n_embd = config.n_embd,
             weight_decay = config.weight_decay,
             learning_rate = config.learning_rate,
+            betas = config.betas
         )
 
     def get_model_training_config(self) -> ModelTrainingConfig:

@@ -17,7 +17,7 @@ class ModelVerificationTrainingPipeline:
             device = get_device()
             model = GPT(config=config)
             model.to(device)
-            optimizer = model.configure_optimizer(weight_decay=config.weight_decay, learning_rate=config.learning_rate, device_type=device)
+            optimizer = model.configure_optimizer(weight_decay=config.weight_decay, learning_rate=config.learning_rate, betas=config.betas ,device_type=device)
 
             # Optionally, perform a simple forward pass check
             dummy_config = config_manager.get_data_transformation_config()

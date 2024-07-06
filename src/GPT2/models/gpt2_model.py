@@ -198,7 +198,7 @@ class GPT(nn.Module):
         logger.info(f"Successfully weights loaded from pretrained gpt {model_type}")
         return model
     
-    def configure_optimizer(self, weight_decay, learning_rate, device_type):
+    def configure_optimizer(self, weight_decay, learning_rate, betas,  device_type):
         # Start with all of Parameters (that require grad)
         param_dict = {pn: p for pn, p in self.named_parameters()} # have to change to self
         param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
@@ -219,6 +219,6 @@ class GPT(nn.Module):
         use_fused = fused_available and device_type == "cuda"
         logger.info(f"using fused AdamW: {use_fused}")
 
-        optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=(0.9, 0.95), eps=1e-8, fused=use_fused)
+        optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=betas, eps=1e-8, fused=use_fused)
         return optimizer
 
