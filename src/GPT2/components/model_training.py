@@ -1,6 +1,6 @@
 
 from  GPT2.models.gpt2_model import GPT, GPTConfig
-from GPT2.utils.model_utils import get_device
+from GPT2.utils.model_utils import get_device, setup_distributed
 from GPT2.logging import logger
 
 import torch
@@ -8,7 +8,18 @@ import math
 import time
 from torch.nn import functional as F
 
-device = get_device()
+
+
+# Set up DDP (Distributed Data Parallel)
+dist_config = setup_distributed()
+ddp = dist_config.ddp
+ddp_rank = dist_config.ddp_rank
+ddp_local_rank = dist_config.ddp_local_rank
+ddp_world_size = dist_config.ddp_world_size
+master_process = dist_config.master_process
+device = dist_config.device
+device_type = dist_config.device_type
+
 torch.manual_seed(1337)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(1337)
