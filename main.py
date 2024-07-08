@@ -30,7 +30,7 @@ STAGE_NAME = "Model Validation stage"
 try:
     logger.info(f"\n\nx{'=' * 80}x \n\n>>>>>> stage {STAGE_NAME} started <<<<<<")
     model_verification_pipeline = ModelVerificationTrainingPipeline()
-    model, optimizer = model_verification_pipeline.main()
+    model, optimizer, raw_model = model_verification_pipeline.main()
     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx{'=' * 80}x")
 except Exception as e:
     logger.exception(e)
@@ -39,7 +39,7 @@ except Exception as e:
 STAGE_NAME = "Model Training stage"
 try:
     logger.info(f"\n\nx{'=' * 80}x \n\n>>>>>> stage {STAGE_NAME} started <<<<<<")
-    model_training = ModelTrainingPipeline(train_loader, model, optimizer)
+    model_training = ModelTrainingPipeline(train_loader, model, optimizer, raw_model)
     model_training.main()
     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx{'=' * 80}x")
 except Exception as e:

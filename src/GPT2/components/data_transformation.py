@@ -124,9 +124,11 @@ def process_documents_parallel(tokenizer):
 
 
 class DataLoaderLite:
-    def __init__(self, config):
+    def __init__(self, config, process_rank, num_processes):
         self.B = config.B
         self.T = config.T
+        self.process_rank = process_rank
+        self.num_processes = num_processes
 
         with open ("tiny_shakespeare.txt", "r") as file:
             text = file.read()
@@ -136,14 +138,14 @@ class DataLoaderLite:
         logger.info(f"loaded {len(self.tokens)} tokens")
         logger.info(f"loaded {len(self.tokens) // (self.B*self.T)} batches")
 
-        self.current_position = 0
+        self.current_position = self.B * self.T * self.process_rank
 
     def next_batch(self):
         buf = self.tokens[self.current_position : self.current_position+self.B*self.T+1 ]
         x = buf[:-1].view(self.B, self.T)
         y = buf[1:].view(self.B, self.T)
-        self.current_position += self.B * self.T
-        if self.current_position > len(self.tokens):
-            self.current_position = 0 
+        self.current_position += self.B * self.T * self.num_processes
+        if self.current_position + (self.B * self.T * self.num_processes + 1)> len(self.tokens):
+            self.current_position = self.B * self.T * self.process_rank
         return x, y
 
