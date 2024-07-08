@@ -71,7 +71,7 @@ class DataTokenizer:
                 token_count += len(tokens)
             else:
                 split = "val" if shard_index == 0 else "train"
-                filename = os.path.join(self.transformed_file_path, f"edufineweb_{split}_{shard_index:06d}")
+                filename = os.path.join(self.transformed_file_path, f"{self.config.dataset}_{split}_{shard_index:06d}")
                 remainder = self.config.shard_size - token_count
                 all_tokens_np[token_count:token_count+remainder] = tokens[:remainder]
                 self.write_datafile(filename, all_tokens_np)
@@ -81,7 +81,7 @@ class DataTokenizer:
 
         if token_count != 0:
             split = "val" if shard_index == 0 else "train"
-            filename = os.path.join(self.transformed_file_path, f"edufineweb_{split}_{shard_index:06d}")
+            filename = os.path.join(self.transformed_file_path, f"{self.config.dataset}_{split}_{shard_index:06d}")
             self.write_datafile(filename, all_tokens_np[:token_count])
 
 def process_documents_parallel(tokenizer):
@@ -107,7 +107,7 @@ def process_documents_parallel(tokenizer):
                     progress_bar.update(len(tokens))
                 else:
                     split = "val" if shard_index == 0 else "train"
-                    filename = os.path.join(tokenizer.transformed_file_path, f"edufineweb_{split}_{shard_index:06d}")
+                    filename = os.path.join(tokenizer.transformed_file_path, f"{tokenizer.config.dataset}_{split}_{shard_index:06d}")
                     remainder = tokenizer.config.shard_size - token_count
                     progress_bar.update(remainder)
                     all_tokens_np[token_count:token_count+remainder] = tokens[:remainder]
@@ -119,25 +119,38 @@ def process_documents_parallel(tokenizer):
 
         if token_count != 0:
             split = "val" if shard_index == 0 else "train"
-            filename = os.path.join(tokenizer.transformed_file_path, f"edufineweb_{split}_{shard_index:06d}")
+            filename = os.path.join(tokenizer.transformed_file_path, f"{tokenizer.config.dataset}_{split}_{shard_index:06d}")
             tokenizer.write_datafile(filename, all_tokens_np[:token_count])
 
+def load_tokens(filename):
+    npt = np.load(filename)
+    npt = npt.astype(np.int32) 
+    ppt = torch.tensor(npt, dtype=torch.long)
+    return ppt
 
 class DataLoaderLite:
-    def __init__(self, config, process_rank, num_processes):
+    def __init__(self, config, dist_config, split):
         self.B = config.B
         self.T = config.T
-        self.process_rank = process_rank
-        self.num_processes = num_processes
+        self.process_rank = dist_config.ddp_rank
+        self.num_processes = dist_config.ddp_world_size
+        master_process = dist_config.master_process
+        assert split in {'train', 'val'}
 
-        with open ("tiny_shakespeare.txt", "r") as file:
-            text = file.read()
-        enc = tiktoken.get_encoding('gpt2')
-        tokens = enc.encode(text)
-        self.tokens = torch.tensor(tokens, dtype=torch.long)
-        logger.info(f"loaded {len(self.tokens)} tokens")
-        logger.info(f"loaded {len(self.tokens) // (self.B*self.T)} batches")
+        data_path = Path(os.path.join(config.local_data_file, config.dataset_name))
+        shards = os.listdir(data_path)
+        shards = [s for s in shards if split in s ]
+        shards = sorted(shards)
+        shards = [os.path.join(data_path, s) for s in shards]
+        self.shards = shards
+        assert len(shards) > 0 , f"No shards found for split: {split}"
+        if master_process:
+            logger.info(f" Found {len(shards)} shards for solit: {split}")
+        self.reset()
 
+    def reset(self):
+        self.current_shard = 0
+        self.tokens = load_tokens(self.shards[self.current_shard])
         self.current_position = self.B * self.T * self.process_rank
 
     def next_batch(self):
@@ -145,7 +158,10 @@ class DataLoaderLite:
         x = buf[:-1].view(self.B, self.T)
         y = buf[1:].view(self.B, self.T)
         self.current_position += self.B * self.T * self.num_processes
-        if self.current_position + (self.B * self.T * self.num_processes + 1)> len(self.tokens):
+        # If loading the next batch would be out of bounds, move to the next shard.
+        if self.current_position + (self.B * self.T * self.num_processes + 1 )> len(self.tokens):
+            self.current_shard = (self.current_shard + 1) % len(self.shards)
+            self.tokens = load_tokens(self.shards[self.current_shard])
             self.current_position = self.B * self.T * self.process_rank
         return x, y
 

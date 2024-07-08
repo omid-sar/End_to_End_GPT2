@@ -14,12 +14,7 @@ class DataTransformationTrainingPipeline():
             data_transformation_config = config.get_data_transformation_config()
             tokenizer = DataTokenizer(config=data_transformation_config)
             dist_config = setup_distributed()
-            num_processes = dist_config.ddp_world_size
-            process_rank = dist_config.ddp_rank
-            train_loader = DataLoaderLite(config=data_transformation_config,
-                                          process_rank = dist_config.ddp_rank,
-                                          num_processes = dist_config.ddp_world_size
-                                          )
+            train_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
         
             logger.info(f"Starting data transformation with multiprocessing={'enabled' if use_multiprocessing else 'disabled'}")
             
