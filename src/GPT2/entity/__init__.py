@@ -58,7 +58,14 @@ class ModelTrainingConfig:
 @dataclass(frozen=True)
 class ModelEvaluationConfig:
     root_dir: Path
+    benchmarks: List[str]
+    benchmark_frequency: int
 
 @dataclass(frozen=True)
 class ModelInferenceConfig:
     root_dir: Path
+
+@dataclass(frozen=True)
+class BenchmarkConfig:
+    root_dir: Path
+    hellaswag: dict

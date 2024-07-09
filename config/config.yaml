@@ -44,8 +44,14 @@ model_training:
 
 model_evaluation:
   root_dir: artifacts/model_evaluation
+  benchmarks:
+    - hellaswag
+  benchmark_frequency: 1  # Run benchmarks every N epochs
 
 model_inference:
-root_dir: artifacts/model_inference
+  root_dir: artifacts/model_inference
 
-
+benchmarks:
+  root_dir: artifacts/benchmarks
+  hellaswag:
+    data_path: artifacts/benchmarks/hellaswag

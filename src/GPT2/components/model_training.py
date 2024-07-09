@@ -9,6 +9,7 @@ from torch.distributed import init_process_group, destroy_process_group
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 from GPT2.logging import logger
+from GPT2.components.model_evaluation import inference_step
 
 
 
@@ -105,38 +106,8 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
 
         # once in a while, genearte from the model
         if ((step > 0 and step % 3 == 0 ) or last_step) and (not use_compile):
-            model.eval()
-            text = "Hello, I'm a model,"
-            num_return_sequences = 4
-            max_lenght = 32
-            # logger.info(f"Inferencing GPT2 model with HuggingFace GPT2 Weights,[num_return_sequences: {num_return_sequences}],[max_lenght: {max_lenght}], [Sample text: {text}]")
-            enc = tiktoken.get_encoding('gpt2')
-            tokens = enc.encode(text)
-            tokens = torch.tensor(tokens, dtype=torch.long)
-            tokens = tokens.unsqueeze(0).repeat(num_return_sequences, 1)
-            xgen = tokens.to(device)
-            sample_rng = torch.Generator(device=device)
-            sample_rng.manual_seed(42 + ddp_rank)
-            while xgen.size(1) < max_lenght:
-                # Forward path to create logits
-                with torch.no_grad():
-                    #****with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
-                    logits, loss = model(x) #(B, T, vocab_size)
-                    logits = logits[:,-1,:] # (B, vocab_size) we just take the logits of last token
-                    probs = F.softmax(logits, dim=-1) # Get the probabilities (5, vocab_size)
-                    # Do top-K sampling of 50 (HF pipeline default)
-                    topk_probs, topk_indices = torch.topk(probs, 50, dim=-1) # topk_probs(5, 50), topk_indices(5, 50)
-                    # Select a token from the top-k probabilities 
-                    ix = torch.multinomial(topk_probs, 1, generator=sample_rng) #(B, 1)
-                    xcol = torch.gather(topk_indices, -1, ix)  # (B, 1)
-                    xgen = torch.cat((xgen, xcol), dim=1)
-
-            # print the generated text
-            for i in range(num_return_sequences):
-                tokens = xgen[i, :max_lenght].tolist()
-                decoded = enc.decode(tokens)
-                logger.info(f'{"-" * 75} \n Rank:{ddp_rank} | Sample:{i} | {decoded}')
-
+            inference_step(model, device, ddp_rank)
+    
            
         model.train()
         optimizer.zero_grad()
