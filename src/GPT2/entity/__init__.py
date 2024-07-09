@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, List
 
 @dataclass(frozen=True)
 class DataIngestionConfig:
