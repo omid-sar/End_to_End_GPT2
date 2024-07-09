@@ -68,4 +68,4 @@ class ModelInferenceConfig:
 @dataclass(frozen=True)
 class BenchmarkConfig:
     root_dir: Path
-    hellaswag: dict
+    hellaswag_data_path: Path

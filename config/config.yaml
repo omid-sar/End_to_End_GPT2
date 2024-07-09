@@ -53,5 +53,5 @@ model_inference:
 
 benchmarks:
   root_dir: artifacts/benchmarks
-  hellaswag:
-    data_path: artifacts/benchmarks/hellaswag
+  benchmark_name:
+  hellaswag_data_path: artifacts/benchmarks/hellaswag

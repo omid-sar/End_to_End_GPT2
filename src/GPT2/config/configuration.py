@@ -1,7 +1,7 @@
 from GPT2.constants import *
 from GPT2.utils.common import read_yaml, create_directories
 from GPT2.entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig
-from GPT2.entity import GPTConfig, ModelTrainingConfig, ModelEvaluationConfig, ModelInferenceConfig
+from GPT2.entity import GPTConfig, ModelTrainingConfig, ModelEvaluationConfig, ModelInferenceConfig, BenchmarkConfig
 
 
 class ConfigurationManager:
@@ -103,6 +103,15 @@ class ConfigurationManager:
         config = self.config.model_inference
         create_directories([config.root_dir])
         model_inference_config = ModelInferenceConfig(
-            root_dir=Path(config.root_dir)
+            root_dir=config.root_dir
         )
         return model_inference_config
+    
+    def get_benchmarks(self):
+        config = self.config.benchmarks
+        create_directories([config.root_dir])
+        benchmarks_config = BenchmarkConfig(
+            root_dir=config.root_dir,
+            hellaswag_data_path = config.hellaswag_data_path,
+        )
+        return benchmarks_config
