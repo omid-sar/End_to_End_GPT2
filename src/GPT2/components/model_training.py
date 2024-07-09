@@ -152,7 +152,7 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
 
         # once in a while, genearte from the model
         if ((step > 0 and step % 3 == 0 ) or last_step) and (not use_compile):
-            inference_step(model, device, ddp_rank
+            inference_step(model, device, ddp_rank)
     
     if ddp:
         destroy_process_group()
