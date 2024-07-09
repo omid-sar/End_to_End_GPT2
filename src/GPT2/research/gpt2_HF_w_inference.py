@@ -15,7 +15,7 @@ if torch.cuda.is_available():
 # ---------------------- Tokenize with the same sentece to compare HF model weights ------------------------
 import tiktoken
 
-text = "Hello, I'm a model that can complete sentences. Watch me go!"
+text = "Hello, I'm a model, "
 num_return_sequences = 5
 max_lenght = 50
 logger.info(f"Inferencing GPT2 model with HuggingFace GPT2 Weights,[num_return_sequences: {num_return_sequences}],[max_lenght: {max_lenght}], [Sample text: {text}]")

@@ -20,7 +20,7 @@ STAGE_NAME = "Data Transformation stage"
 try:
     logger.info(f"\n\nx{'=' * 80}x \n\n>>>>>> stage {STAGE_NAME} started <<<<<<")
     data_transformation = DataTransformationTrainingPipeline()
-    train_loader = data_transformation.main(use_multiprocessing=False) #*** should be True for GPUs
+    train_loader, val_loader = data_transformation.main(use_multiprocessing=False) #*** should be True for GPUs
     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx{'=' * 80}x")
 except Exception as e:
     logger.exception(e)
@@ -39,7 +39,7 @@ except Exception as e:
 STAGE_NAME = "Model Training stage"
 try:
     logger.info(f"\n\nx{'=' * 80}x \n\n>>>>>> stage {STAGE_NAME} started <<<<<<")
-    model_training = ModelTrainingPipeline(train_loader, model, optimizer, raw_model)
+    model_training = ModelTrainingPipeline(train_loader, val_loader, model, optimizer, raw_model, use_compile=False)
     model_training.main()
     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx{'=' * 80}x")
 except Exception as e:

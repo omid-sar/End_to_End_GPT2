@@ -15,6 +15,7 @@ class DataTransformationTrainingPipeline():
             tokenizer = DataTokenizer(config=data_transformation_config)
             dist_config = setup_distributed()
             train_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
+            val_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
         
             logger.info(f"Starting data transformation with multiprocessing={'enabled' if use_multiprocessing else 'disabled'}")
             
@@ -22,7 +23,7 @@ class DataTransformationTrainingPipeline():
                 process_documents_parallel(tokenizer)
             else:
                 tokenizer.process_documents_sequential()
-            return train_loader
+            return train_loader, val_loader
         
         except Exception as e:
             logger.error(f"An error occurred during data transformation: {str(e)}")

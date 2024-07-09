@@ -5,11 +5,13 @@ from GPT2.utils.model_utils import setup_distributed
 
 
 class ModelTrainingPipeline():
-    def __init__(self, train_loader, model, optimizer, raw_model) -> None:
+    def __init__(self, train_loader,val_loader, model, optimizer, raw_model, use_compile) -> None:
         self.train_loader = train_loader
+        self.val_loader = val_loader
         self.optimizer = optimizer
         self.raw_model = raw_model
         self.model = model
+        self.use_compile = use_compile
         self.config = ConfigurationManager()
         self.config = self.config.get_model_training_config()
         self.dist_config = setup_distributed()
@@ -18,10 +20,12 @@ class ModelTrainingPipeline():
         train_model(
             config=self.config,
             train_loader=self.train_loader,
+            val_loader=self.val_loader,
             model=self.model,
             optimizer=self.optimizer,
             raw_model = self.raw_model,
-            dist_config = self.dist_config
+            dist_config = self.dist_config, 
+            use_compile = self.use_compile,
             )
     
 
