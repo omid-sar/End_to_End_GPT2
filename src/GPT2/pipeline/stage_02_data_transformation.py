@@ -14,15 +14,17 @@ class DataTransformationTrainingPipeline():
             data_transformation_config = config.get_data_transformation_config()
             tokenizer = DataTokenizer(config=data_transformation_config)
             dist_config = setup_distributed()
-            train_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
-            val_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
-        
+
             logger.info(f"Starting data transformation with multiprocessing={'enabled' if use_multiprocessing else 'disabled'}")
             
             if use_multiprocessing:
                 process_documents_parallel(tokenizer)
             else:
                 tokenizer.process_documents_sequential()
+                
+            train_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
+            val_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
+
             return train_loader, val_loader
         
         except Exception as e:
