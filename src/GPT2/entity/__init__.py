@@ -47,6 +47,8 @@ class GPTConfig:
 class ModelTrainingConfig:
     root_dir: Path
     model_folder: Path
+    traing_log_file: Path
+    log_name: str
     total_batch_size: int
     B: int
     T: int

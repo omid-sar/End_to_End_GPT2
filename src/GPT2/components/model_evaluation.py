@@ -65,6 +65,9 @@ def evaluate_hellaswag(model, step, ddp_world_size, ddp_rank, device, device_typ
             acc_norm = num_correct_norm / num_total
             if master_process:
                 logger.info(f" Step:{step} | HellaSwag accuracy: {num_correct_norm}/{num_total}={acc_norm:.4f}")
+                return master_process, acc_norm
+    
+             
         except KeyboardInterrupt:
             logger.info("Evaluation interrupted by user")
         except Exception as e:

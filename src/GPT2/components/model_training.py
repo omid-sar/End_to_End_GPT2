@@ -1,15 +1,14 @@
 import torch
-import tiktoken
 import math
 import time
 import os
 from pathlib import Path
 from torch.nn import functional as F
-from torch.distributed import init_process_group, destroy_process_group
+from torch.distributed import  destroy_process_group
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 from GPT2.logging import logger
-from GPT2.components.model_evaluation import inference_step, evaluate_hellaswag, get_most_likely_row
+from GPT2.components.model_evaluation import inference_step, evaluate_hellaswag
 
 
 
@@ -28,6 +27,10 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
     master_process = dist_config.master_process
     device = dist_config.device
     device_type = dist_config.device_type
+
+    log_file = os.path.join(config.traing_log_file, config.log_name)
+    with open(log_file, "w") as f: # Open for writing to clear the file
+        pass
   
 
     assert config.total_batch_size % (config.B * config.T * ddp_world_size) == 0 , "Make sure total_batch_size is divisible by (B * T * ddp_world_size) "
@@ -106,6 +109,8 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
         token_per_sec = (config.B * config.T * grad_accum_step * ddp_world_size) / dt
         if master_process:
             logger.info(f"Step {step} | Loss: {loss_accum.item():.6f} | LR: {lr:.4e} | Norm: {norm:.4f} | dt: {dt:.2f} sec | tok/sec: {token_per_sec:.2f}")
+            with open(log_file, "a") as f:
+                f.write(f"{step} train {loss_accum.item():.6f}\n")
 
         # once in a while, evaluate our validation loss
         if step % 3 == 0 or last_step:
@@ -130,6 +135,8 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
                 dist.all_reduce(val_loss_accum, op=dist.ReduceOp.AVG)
             if master_process:
                 logger.info(f"Step: {step} | val: {val_loss_accum.item():.4f}\n")
+                with open(log_file, "a") as f:
+                    f.write(f"{step} val {val_loss_accum.item():.4f}\n")
                 # Save model checkpoints
                 if step > 0 and (step % 5000 == 0 or last_step):
                     model_path = Path(config.model_folder) 
@@ -148,7 +155,10 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
 
         # once in a while evaluate hellaswag
         if ((step > 0 and step % 3 == 0 ) or last_step) and (not use_compile):
-            evaluate_hellaswag(model, step, ddp_world_size, ddp_rank, device, device_type, ddp, master_process)
+            master_process, acc_norm = evaluate_hellaswag(model, step, ddp_world_size, ddp_rank, device, device_type, ddp, master_process)
+            if master_process:
+                with open(log_file, "a") as f:
+                    f.write(f"{step} hella {acc_norm:.4f}\n")
 
         # once in a while, genearte from the model
         if ((step > 0 and step % 3 == 0 ) or last_step) and (not use_compile):

@@ -75,10 +75,13 @@ class ConfigurationManager:
         config = self.config.model_training
 
         create_directories([config.root_dir])
+        create_directories([config.model_folder])
 
         model_training_config = ModelTrainingConfig(
             root_dir = config.root_dir,
             model_folder = config.model_folder,
+            traing_log_file = config.traing_log_file,
+            log_name = config.log_name,
             total_batch_size = config.total_batch_size,
             B = config.B,
             T = config.T,
