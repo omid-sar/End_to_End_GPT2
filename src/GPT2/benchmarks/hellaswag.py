@@ -11,7 +11,8 @@ from GPT2.config.configuration import ConfigurationManager
 from pathlib import Path
 
 # -----------------------------------------------------------------------------
-file_path = Path("../../../artifacts/benchmarks/hellaswag")
+
+file_path = Path("artifacts/benchmark/hellaswag")
 if not file_path.exists():
     os.makedirs(file_path, exist_ok=True)
 
@@ -152,3 +153,4 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--device", type=str, default="cuda", help="the device to use")
     args = parser.parse_args()
     evaluate(args.model_type, args.device)
+
