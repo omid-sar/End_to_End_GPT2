@@ -64,20 +64,45 @@ Host lambda-gpu
 - **Connect**: Return to the Command Palette, select `SSH: Connect to Host`, and choose your configured host.
 
 ## File Transfer Using SCP
-Transfer files efficiently from your local machine to your Lambda Labs instance using the SCP command, If you navigate to the directory containing the project folder from the terminal, the second of "cache files are excluded":
+Transfer files efficiently from your local machine to your Lambda Labs instance using the SCP command, If you navigate to the directory containing the project folder from the terminal, and running the followind command in your local terminal:
 
 ```bash
-scp -i ~/.ssh/id_ed25519 -r ./ ubuntu@104.171.203.119:~/
-rsync -avz --exclude='.cache/' --exclude='*/cache/' -e "ssh -i ~/.ssh/id_ed25519" ./ ubuntu@104.171.203.119:~/gpt
+tar --exclude=".*" -czf - ./ 2>/dev/null | ssh lambda-gpu "mkdir -p ~/gpt && tar -xzf - -C ~/gpt"
  ```
  Details
+1. `tar`: The command to create or extract archive files.
 
-	•	-i ~/.ssh/id_ed25519: Specifies the SSH private key for authentication.
-	•	-r: Enables recursive copying, necessary for directories.
-	•	ubuntu@XXX.XXX.XXX.XXX:~/: Target directory on the remote instance.
+2. `--exclude=".*"`: Excludes all files and directories that start with a dot (hidden files in Unix-like systems).
 
-Ensure the SSH key permissions are correctly set (chmod 600) to prevent any connection issues.
+3. `-czf -`:
+   - `-c`: Create a new archive
+   - `-z`: Compress the archive using gzip
+   - `-f -`: Use stdout as the archive file ('-' means stdout)
 
+4. `./`: The directory to archive (current directory in this case)
+
+5. `2>/dev/null`: Redirects standard error (stderr) to /dev/null, effectively silencing any error messages or warnings
+
+6. `|`: Pipes the output of the tar command to the input of the ssh command
+
+7. `ssh lambda-gpu`: Connects to the remote server named 'lambda-gpu' (as defined in your SSH config)
+
+8. `"mkdir -p ~/gpt && tar -xzf - -C ~/gpt"`: The command to be executed on the remote server:
+   - `mkdir -p ~/gpt`: Creates the ~/gpt directory if it doesn't exist
+   - `&&`: Executes the next command only if the previous one succeeds
+   - `tar -xzf - -C ~/gpt`:
+     - `-x`: Extract files from an archive
+     - `-z`: The archive is compressed with gzip
+     - `-f -`: Read the archive from stdin ('-' means stdin)
+     - `-C ~/gpt`: Change to the ~/gpt directory before extracting
+
+In summary, this command does the following:
+1. Creates a compressed tar archive of the current directory, excluding hidden files.
+2. Silences any warnings or errors from the tar command.
+3. Pipes this archive directly to the ssh command.
+4. Connects to the remote server.
+5. On the remote server, it creates a ~/gpt directory if it doesn't exist.
+6. Extracts the received archive into the ~/gpt directory on the remote server.
 ## Setting Up VSCode Extensions via SSH
 
 To streamline your VSCode setup on remote servers through SSH, use the provided script to install essential extensions. Execute these commands in your terminal:
