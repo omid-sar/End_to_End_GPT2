@@ -67,7 +67,6 @@ Host lambda-gpu
 Transfer files efficiently from your local machine to your Lambda Labs instance , If you navigate to the directory containing the project folder from the terminal, and running the followind command in your local terminal:
 
 ```bash
-tar --exclude=".*" -czf - ./ 2>/dev/null | ssh lambda-gpu "mkdir -p ~/gpt && tar -xzf - -C ~/gpt"
 tar -czvf - ./ 2>/dev/null | ssh lambda-gpu "mkdir -p ~/gpt && tar -xzvf - -C ~/gpt"  
  ```
  Details
