@@ -6,7 +6,7 @@ from GPT2.benchmarks.hellaswag import iterate_examples, render_example
 import torch.distributed as dist
 
 
-def inference_step(model, device, ddp_rank):
+def inference_step(model, device, device_type, ddp_rank):
         model.eval()
         text = "Hello, I'm a model,"
         num_return_sequences = 4
@@ -22,7 +22,8 @@ def inference_step(model, device, ddp_rank):
         
         while xgen.size(1) < max_length:
             with torch.no_grad():
-                logits, loss = model(xgen)
+                with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
+                    logits, loss = model(xgen)
                 logits = logits[:, -1, :]
                 probs = F.softmax(logits, dim=-1)
                 topk_probs, topk_indices = torch.topk(probs, 50, dim=-1)
@@ -49,8 +50,8 @@ def evaluate_hellaswag(model, step, ddp_world_size, ddp_rank, device, device_typ
                 mask = mask.to(device)
                 # get the logits
                 with torch.no_grad():
-                    #***with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
-                    logits, loss = model(tokens)
+                    with torch.autocast(device_type=device_type, dtype=torch.bfloat16): #%%%
+                        logits, loss = model(tokens)
                     pred_norm = get_most_likely_row(tokens, mask, logits)
                 num_total += 1
                 num_correct_norm += int(pred_norm == label)

@@ -78,7 +78,7 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
             x, y = x.to(device), y.to(device)
             # Just A100 and above: Automatic Mixed Precision package. It's just applying 
             # in the forward path and it doesn't apply to all layers, just very selective ones
-            with torch.autocast(device_type=device, dtype=torch.bfloat16): #%%% torch.autocast doesn't work on other than A100/H100, so the assert doesn't work for other than A100/H10
+            with torch.autocast(device_type=device_type, dtype=torch.bfloat16): #%%% torch.autocast doesn't work on other than A100/H100, so the assert doesn't work for other than A100/H10
                 logits, loss = model(x,y)
                 assert logits.dtype is torch.bfloat16
             loss = loss / grad_accum_step
@@ -124,7 +124,7 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
                     x, y = x.to(device), y.to(device)
                     # Just A100 and above: Automatic Mixed Precision package. It's just applying 
                     # in the forward path and it doesn't apply to all layers, just very selective ones
-                    with torch.autocast(device_type=device, dtype=torch.bfloat16): #%%% torch.autocast doesn't work on other than A100/H100
+                    with torch.autocast(device_type=device_type, dtype=torch.bfloat16): #%%% torch.autocast doesn't work on other than A100/H100
                         logits, loss = model(x,y)
                         assert logits.dtype is torch.bfloat16 #%%% torch.autocast doesn't work on other than A100/H100, so the assert doesn't work for other than A100/H10
                     loss = loss / val_loss_steps
@@ -162,7 +162,7 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
 
         # once in a while, genearte from the model
         if ((step > 0 and step % 50 == 0 ) or last_step) and (not use_compile):
-            inference_step(model, device, ddp_rank)
+            inference_step(model, device, device_type, ddp_rank)
     
     if ddp:
         destroy_process_group()

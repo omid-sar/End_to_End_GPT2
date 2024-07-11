@@ -16,6 +16,7 @@ class ModelVerificationTrainingPipeline:
             config = config_manager.get_gpt_config()
             model = GPT(config=config)
             dist_config = setup_distributed()
+            device_type = dist_config.device_type
             device = dist_config.device
             model.to(device)
             #***model = torch.compile(model) # torch.compile interferes with HellaSwag eval and Generation. there is problem here
@@ -23,7 +24,7 @@ class ModelVerificationTrainingPipeline:
                  model = DDP(model, device_ids=[dist_config.ddp_local_rank])
             # a consistent way to access the underlying model, whether it's wrapped in DDP or not.
             raw_model = model.module if dist_config.ddp else model 
-            optimizer = raw_model.configure_optimizer(weight_decay=config.weight_decay, learning_rate=config.learning_rate, betas=config.betas ,device_type=device)
+            optimizer = raw_model.configure_optimizer(weight_decay=config.weight_decay, learning_rate=config.learning_rate, betas=config.betas ,device_type=device_type)
 
             # Optionally, perform a simple forward pass check
             dummy_config = config_manager.get_data_transformation_config()
