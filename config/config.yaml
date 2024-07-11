@@ -39,10 +39,10 @@ model_training:
   total_batch_size: 524288 #%%%8192 # 2^19 based on 124M GPT3 mdoel
   B: 16 #%%%4 # Micro batch size #***64
   T: 1024 # Sequence length
-  max_lr: 0.0006
-  min_lr: 0.00006 #max_lr * 0.1
-  warmup_steps: 5
-  max_steps: 100 #***
+  max_lr: 0.0012
+  min_lr: 0.00012 #max_lr * 0.1
+  warmup_steps: 10
+  max_steps: 200 #***
 
 model_evaluation:
   root_dir: artifacts/model_evaluation

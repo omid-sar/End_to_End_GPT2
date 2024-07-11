@@ -161,7 +161,7 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
                     f.write(f"{step} hella {acc_norm:.4f}\n")
 
         # once in a while, genearte from the model
-        if ((step > 0 and step % 3 == 50 ) or last_step) and (not use_compile):
+        if ((step > 0 and step % 50 == 0 ) or last_step) and (not use_compile):
             inference_step(model, device, ddp_rank)
     
     if ddp:
