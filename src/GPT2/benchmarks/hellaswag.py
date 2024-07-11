@@ -89,11 +89,11 @@ def iterate_examples(split):
     print(" << WARNING >> \n modifiied iterate_examples  function to just iterate on 1/100 of HallaSwag dataset ")
     download(split)
     with open(os.path.join(file_path, f"hellaswag_{split}.jsonl"), "r") as f:
-        #***for line in f:
-        for i, line in enumerate(f):
-            if i % 100 == 0:
-                example = json.loads(line)
-                yield example
+        for line in f:
+        # for i, line in enumerate(f): #%%% to work on 1/100 of benchmark dataset
+        #     if i % 100 == 0:
+            example = json.loads(line)
+            yield example
 
 @torch.no_grad()
 def evaluate(model_type, device):
