@@ -47,7 +47,7 @@ class DataTokenizer:
         return tokens_np_uint16
 
     def write_datafile(self, filename, tokens_np):
-        np.save(filename, tokens_np)
+        np.save(filename, tokens_np, allow_pickle=False)
 
     def process_single_document(self, doc):
         return self.tokenize(doc)
@@ -183,7 +183,7 @@ class DataLoaderLite:
                 self.reset()
             else:
                 self.tokens = self.load_shard(self.shards[self.current_shard])
-                self.current_position = B * T * self.process_rank          
+                self.current_position = self.B * self.T * self.process_rank          
             # self.current_shard = (self.current_shard + 1) % len(self.shards)
             # self.tokens = load_tokens(self.shards[self.current_shard])
             # self.current_position = self.B * self.T * self.process_rank
