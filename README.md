@@ -12,32 +12,52 @@ Overview
 - Python 3.11
 
 ### Installation Steps
-1. **Clone the Repository**: 
-   ```bash
-   git clone https://github.com/omid-sar/End_to_End_GPT2.git
-   ```
-    ```bash
-    cd End_to_End_GPT2
-    ```
-2. **Create and Activate a Conda Environment**: 
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+There are two methods to set up the environment:
+
+1. **Using Conda (for local GPUs)**:
+   This method is preferred when you have local GPUs and want to avoid interference between library dependencies.
+
    ```bash
+   conda env create -f environment.yml
    conda activate gpt2
+   ```
+2. **Using pip (for remote GPUs)**:
+   This method is useful when running code on remote GPUs where interference problems are less likely.
 
-3. **Install the Requirements**: 
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Run the Application**: 
+### Running the Code
+
+The primary file to run is `main.py`. There are two ways to run it:
+
+1. **For single GPU**:
    ```bash
-   python app.py
+   python main.py
    ```
 
-   After running, access the application via your local host and specified port.
+2. **For multiple GPUs using DDP (e.g., 8 GPUs)**:
+   ```bash
+   torchrun --standalone --nproc_per_node=8 main.py
+   ```
+### Dataset Configuration
+
+In `config.yaml`, a tiny dataset (WikiText) has been added as a toy dataset. This allows for quicker testing without long wait times. To use it:
+
+1. Change the dataset configuration in `config.yaml`:
+   ```yaml
+   dataset_name: "wikitext-2-raw-v1"  # Instead of "sample-10BT"
+   dataset: "wikitext"  # Instead of "HuggingFaceFW/fineweb-edu"
+   ```
+
+2. Change the shard size in `config.yaml`:
+   ```yaml
+   shard_size: 1000000  # Instead of 100000000
+   ```
+
+This setup maintains the same code logic but allows for faster testing. Once you're confident about the code and your hardware, you can switch back to the full "fineweb-edu" dataset.
 
 ## Contact
 - **Author**: Omid Sar
