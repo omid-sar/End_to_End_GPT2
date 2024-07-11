@@ -3,9 +3,12 @@
 
 ## Overview
 
-Overview
-Overview
-Overview
+Building upon [Andrej Karpathy's work](https://github.com/karpathy/build-nanogpt/tree/master) from his GitHub repository, a pipeline for training the model has been created. This pipeline makes it easier to tune model parameters while maintaining code readability and understandability, aligning with Karpathy's emphasis on code clarity as mentioned in his [tweet](https://x.com/karpathy/status/1811140282559385758). The repository provides an excellent opportunity to create GPT-2 and GPT-3 models from scratch using random weights.
+
+This project contains a reproduction of the GPT-2 (124M) model, progressing from an empty file to a full implementation. With more resources, the code can also reproduce GPT-3 models. Reproducing the GPT-2 (124M) model now takes approximately 2 hours and costs about $20, a significant improvement since its introduction in 2019. Users without sufficient GPU power may need to use a cloud GPU service like Lambda.
+
+GPT-2 and GPT-3 are simple language models trained on internet documents, designed to generate text similar to online content. This repository focuses on the base model training and does not cover chat functionality like ChatGPT. After 10 billion tokens of training, the 124M model can generate text when prompted with phrases like "Hello, I'm a language model." 
+
 ## Getting Started
 
 ### Prerequisites
