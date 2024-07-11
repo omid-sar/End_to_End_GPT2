@@ -4,6 +4,7 @@ import os
 from box import ConfigBox
 from GPT2.logging import logger
 from torch.distributed import init_process_group
+import torch.distributed as dist
 
 def get_device():
     device = "cuda" if torch.cuda.is_available() else("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
@@ -82,7 +83,9 @@ def setup_distributed():
 
     if ddp:
         assert torch.cuda.is_available(), "for now we need CUDA for DDP"
-        init_process_group(backend='nccl')
+        # This ensures that the process group is only initialized once.
+        if not dist.is_initialized():
+            init_process_group(backend='nccl')
         ddp_rank = int(os.environ['RANK'])
         ddp_local_rank = int(os.environ['LOCAL_RANK'])
         ddp_world_size = int(os.environ['WORLD_SIZE'])
