@@ -62,9 +62,6 @@ In `config.yaml`, a tiny dataset (WikiText) has been added as a toy dataset. Thi
 
 This setup maintains the same code logic but allows for faster testing. Once you're confident about the code and your hardware, you can switch back to the full "fineweb-edu" dataset.
 
-## Contact
-- **Author**: Omid Sar
-- **Email**: [mr.omid.sardari@gmail.com](mailto:mr.omid.sardari@gmail.com)
 
 ---
 
