@@ -78,9 +78,9 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
             x, y = x.to(device), y.to(device)
             # Just A100 and above: Automatic Mixed Precision package. It's just applying 
             # in the forward path and it doesn't apply to all layers, just very selective ones
-            #***with torch.autocast(device_type=device, dtype=torch.bfloat16):
-            logits, loss = model(x,y)
-                #***$$assert logits.dtype is torch.bfloat16
+            with torch.autocast(device_type=device, dtype=torch.bfloat16): #%%% torch.autocast doesn't work on other than A100/H100, so the assert doesn't work for other than A100/H10
+                logits, loss = model(x,y)
+                assert logits.dtype is torch.bfloat16
             loss = loss / grad_accum_step
             loss_accum += loss.detach()
             if ddp:
@@ -103,7 +103,7 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
         optimizer.step()
-        #***torch.cuda.synchronize() # wait for GPU to finish work
+        torch.cuda.synchronize() #%%% wait for GPU to finish work
         t1 = time.time()
         dt = (t1- t0)
         token_per_sec = (config.B * config.T * grad_accum_step * ddp_world_size) / dt
@@ -124,9 +124,9 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
                     x, y = x.to(device), y.to(device)
                     # Just A100 and above: Automatic Mixed Precision package. It's just applying 
                     # in the forward path and it doesn't apply to all layers, just very selective ones
-                    #***with torch.autocast(device_type=device, dtype=torch.bfloat16):
-                    logits, loss = model(x,y)
-                        #***$$assert logits.dtype is torch.bfloat16
+                    with torch.autocast(device_type=device, dtype=torch.bfloat16): #%%% torch.autocast doesn't work on other than A100/H100
+                        logits, loss = model(x,y)
+                        assert logits.dtype is torch.bfloat16 #%%% torch.autocast doesn't work on other than A100/H100, so the assert doesn't work for other than A100/H10
                     loss = loss / val_loss_steps
                     val_loss_accum += loss.detach()
             if ddp:

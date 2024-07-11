@@ -18,7 +18,7 @@ class ModelVerificationTrainingPipeline:
             dist_config = setup_distributed()
             device = dist_config.device
             model.to(device)
-            #***model = torch.compile(model)
+            #***model = torch.compile(model) # torch.compile interferes with HellaSwag eval and Generation. there is problem here
             if dist_config.ddp:
                  model = DDP(model, device_ids=[dist_config.ddp_local_rank])
             # a consistent way to access the underlying model, whether it's wrapped in DDP or not.

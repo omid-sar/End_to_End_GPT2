@@ -64,10 +64,11 @@ Host lambda-gpu
 - **Connect**: Return to the Command Palette, select `SSH: Connect to Host`, and choose your configured host.
 
 ## File Transfer Using SCP
-Transfer files efficiently from your local machine to your Lambda Labs instance using the SCP command, If you navigate to the directory containing the project folder from the terminal, and running the followind command in your local terminal:
+Transfer files efficiently from your local machine to your Lambda Labs instance , If you navigate to the directory containing the project folder from the terminal, and running the followind command in your local terminal:
 
 ```bash
 tar --exclude=".*" -czf - ./ 2>/dev/null | ssh lambda-gpu "mkdir -p ~/gpt && tar -xzf - -C ~/gpt"
+tar -czvf - ./ 2>/dev/null | ssh lambda-gpu "mkdir -p ~/gpt && tar -xzvf - -C ~/gpt"  
  ```
  Details
 1. `tar`: The command to create or extract archive files.
@@ -116,6 +117,13 @@ chmod +x install_vscode_extensions.sh
 ```
 This script ensures that your remote VSCode environment mirrors the robustness of your local setup with necessary extensions pre-installed. Modify install_vscode_extensions.sh directly in the repository to customize which extensions are installed.
 
+
+## Git configuration on Lambda Labs Terminal :
+
+```bash
+git config --global user.name "omid-sar"
+git config --global user.email "mr.omid.sardari@gmail.com"
+ ```
 
 ## Special Features
 

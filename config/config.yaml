@@ -13,8 +13,8 @@ data_transformation:
   downloaded_files: artifacts/data_ingestion/data
   local_data_file: artifacts/data_transformation/data
   shard_size: 1000000 #*** 100000000 small shard size for toy "wikitext" dataset
-  total_batch_size: 8192 #***524299 # 2^19 based on 124M GPT3 mdoel
-  B: 4 # Micro batch size #***64
+  total_batch_size: 524288 #%%%8192  # 2^19 based on 124M GPT3 mdoel
+  B: 32 #%%%4 Micro batch size #***64
   T: 1024 # Sequence length
 
 gpt_config:
@@ -36,8 +36,8 @@ model_training:
   model_folder: artifacts/model_training/gpt_checkpoints
   traing_log_file: logs
   log_name: "training_log.txt"
-  total_batch_size: 8192 #***524288 # 2^19 based on 124M GPT3 mdoel
-  B: 4 # Micro batch size #***64
+  total_batch_size: 524288 #%%%8192 # 2^19 based on 124M GPT3 mdoel
+  B: 32 #%%%4 # Micro batch size #***64
   T: 1024 # Sequence length
   max_lr: 0.0006
   min_lr: 0.00006 #max_lr * 0.1

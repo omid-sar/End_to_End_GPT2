@@ -20,7 +20,7 @@ STAGE_NAME = "Data Transformation stage"
 try:
     logger.info(f"\n\nx{'=' * 80}x \n\n>>>>>> stage {STAGE_NAME} started <<<<<<")
     data_transformation = DataTransformationTrainingPipeline()
-    train_loader, val_loader = data_transformation.main(use_multiprocessing=False) #*** should be True for GPUs
+    train_loader, val_loader = data_transformation.main(use_multiprocessing=False) #*** should be True for GPUs #%%% should be False MPS
     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx{'=' * 80}x")
 except Exception as e:
     logger.exception(e)
