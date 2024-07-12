@@ -86,7 +86,6 @@ def render_example(example):
     return data, tokens, mask, label
 
 def iterate_examples(split):
-    print(" << WARNING >> \n modifiied iterate_examples  function to just iterate on 1/100 of HallaSwag dataset ")
     download(split)
     with open(os.path.join(file_path, f"hellaswag_{split}.jsonl"), "r") as f:
         for line in f:

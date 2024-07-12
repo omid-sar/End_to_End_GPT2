@@ -53,8 +53,9 @@ def evaluate_hellaswag(model, step, ddp_world_size, ddp_rank, device, device_typ
                     with torch.autocast(device_type=device_type, dtype=torch.bfloat16): #%%%
                         logits, loss = model(tokens)
                     pred_norm = get_most_likely_row(tokens, mask, logits)
-                num_total += 1
-                num_correct_norm += int(pred_norm == label)
+                    if pred_norm is not None:
+                        num_total += 1
+                        num_correct_norm += int(pred_norm == label)
             # reduce the stats across all processes
             if ddp:
                 num_total = torch.tensor(num_total, dtype=torch.long, device=device)
@@ -63,17 +64,17 @@ def evaluate_hellaswag(model, step, ddp_world_size, ddp_rank, device, device_typ
                 dist.all_reduce(num_correct_norm, op=dist.ReduceOp.SUM)
                 num_total = num_total.item()
                 num_correct_norm = num_correct_norm.item()
-            acc_norm = num_correct_norm / num_total
+            acc_norm = num_correct_norm / num_total if num_total > 0 else 0  # Avoid division by zero
             if master_process:
                 logger.info(f" Step:{step} | HellaSwag accuracy: {num_correct_norm}/{num_total}={acc_norm:.4f}")
                 return master_process, acc_norm
     
-             
         except KeyboardInterrupt:
             logger.info("Evaluation interrupted by user")
         except Exception as e:
             logger.error(f"Error during evaluation: {str(e)}")
-        
+        return master_process, 0  # Return default values in case of error
+
 def get_most_likely_row(tokens, mask, logits):
     try:
         # evaluate the autoregressive loss at all positions
