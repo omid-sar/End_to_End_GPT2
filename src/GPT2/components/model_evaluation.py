@@ -8,9 +8,9 @@ import torch.distributed as dist
 
 def inference_step(model, device, device_type, ddp_rank):
         model.eval()
-        text = "Hello, I'm a model,"
-        num_return_sequences = 4
-        max_length = 32
+        text = "Hello, I'm a language model,"
+        num_return_sequences = 1
+        max_length = 64
         
         enc = tiktoken.get_encoding('gpt2')
         tokens = enc.encode(text)

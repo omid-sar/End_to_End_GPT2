@@ -4,7 +4,7 @@ import inspect
 import math
 import torch.nn as nn
 from torch.nn import functional as F
-from GPT2.logging import logger
+from GPT2.logging import logger, is_master_process
 
 # ----------- Temporary to load Config localy here not main.py -----
 #from GPT2.config.configuration import ConfigurationManager
@@ -212,12 +212,14 @@ class GPT(nn.Module):
         ]
         num_decay_params = sum(p.numel() for p in decay_params)
         num_nodecay_params = sum(p.numel() for p in nodecay_params)
-        logger.info(f"Number of decayed parameter tensors: {len(decay_params)}, with {num_decay_params:,} parameters")
-        logger.info(f"Number of Non-decayed parameter tensors: {len(nodecay_params)}, with {num_nodecay_params:,} parameters")
+        if is_master_process:
+            logger.info(f"Number of decayed parameter tensors: {len(decay_params)}, with {num_decay_params:,} parameters")
+            logger.info(f"Number of Non-decayed parameter tensors: {len(nodecay_params)}, with {num_nodecay_params:,} parameters")
         # Create AdamW optimizer and use the fused version if it available 
         fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
         use_fused = fused_available and device_type == "cuda"
-        logger.info(f"using fused AdamW: {use_fused}")
+        if is_master_process:
+            logger.info(f"using fused AdamW: {use_fused}")
 
         optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=betas, eps=1e-8, fused=use_fused)
         return optimizer
