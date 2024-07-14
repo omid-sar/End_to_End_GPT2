@@ -86,8 +86,8 @@ def get_size(path: Path) -> str:
 
 
 class DirectoryTree:
-    def __init__(self, root_path: Path):
-        self.root_path = root_path
+    def __init__(self, root_path):
+        self.root_path = Path(root_path)  # Convert to Path object if it's not already
         self.tree = []
 
     def _generate_tree(self, directory: Path, level: int = 0):
@@ -113,6 +113,7 @@ class DirectoryTree:
 
         with open(file_output_name, 'w') as output_file:
             output_file.writelines(self.tree)
+
 
 
 
