@@ -76,6 +76,11 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
         for micro_step in range(grad_accum_step):
             x, y = train_loader.next_batch()
             x, y = x.to(device), y.to(device)
+            if ddp:
+                # We don't want DDP in each micro_step applying all_reduce after calculating the gradient during loss.backward 
+                # Since it's just meaningless, we need adding gradient until the last micro_step then applying all_reduce.
+                # after running loss.backward(), all the ranks has access to the average of all the gradients
+                model.require_backward_grad_sync = (micro_step == grad_accum_step - 1)
             # Just A100 and above: Automatic Mixed Precision package. It's just applying 
             # in the forward path and it doesn't apply to all layers, just very selective ones
             with torch.autocast(device_type=device_type, dtype=torch.bfloat16): #%%% torch.autocast doesn't work on other than A100/H100, so the assert doesn't work for other than A100/H10
@@ -83,11 +88,6 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
                 assert logits.dtype is torch.bfloat16
             loss = loss / grad_accum_step
             loss_accum += loss.detach()
-            if ddp:
-                # We don't want DDP in each micro_step applying all_reduce after calculating the gradient during loss.backward 
-                # Since it's just meaningless, we need adding gradient until the last micro_step then applying all_reduce.
-                # after running loss.backward(), all the ranks has access to the average of all the gradients
-                model.require_backward_grad_sync = (micro_step == grad_accum_step - 1)
             loss.backward()
         if ddp:
             # Since loss_accum outside of DDP cintainer, it hasn't impacted yet and it only shows accumulated loss for the master rank GPU.
