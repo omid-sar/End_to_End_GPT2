@@ -56,6 +56,7 @@ class ModelTrainingConfig:
     min_lr: float
     warmup_steps: int
     max_steps: int
+    val_steps: int
 
 @dataclass(frozen=True)
 class ModelEvaluationConfig:

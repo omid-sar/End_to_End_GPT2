@@ -89,6 +89,7 @@ class ConfigurationManager:
             min_lr = config.min_lr,
             warmup_steps = config.warmup_steps,
             max_steps = config.max_steps,
+            val_steps = config.val_steps,
         )
 
         return model_training_config

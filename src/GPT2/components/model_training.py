@@ -113,7 +113,7 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
                 f.write(f"{step} train {loss_accum.item():.6f}\n")
 
         # once in a while, evaluate our validation loss
-        if step % 50 == 0 or last_step:
+        if step % config.val_steps == 0 or last_step:
             model.eval()
             val_loader.reset()
             with torch.no_grad():
@@ -154,14 +154,14 @@ def train_model(config, train_loader, val_loader, model, optimizer, raw_model, d
                     torch.save(checkpoint, checkpoint_path)
 
         # once in a while evaluate hellaswag
-        if ((step > 0 and step % 50 == 0 ) or last_step) and (not use_compile):
+        if ((step > 0 and step % config.val_steps == 0 ) or last_step) and (not use_compile):
             master_process, acc_norm = evaluate_hellaswag(model, step, ddp_world_size, ddp_rank, device, device_type, ddp, master_process)
             if master_process:
                 with open(log_file, "a") as f:
                     f.write(f"{step} hella {acc_norm:.4f}\n")
 
         # once in a while, genearte from the model
-        if ((step > 0 and step % 50 == 0 ) or last_step) and (not use_compile):
+        if ((step > 0 and step % config.val_steps == 0 ) or last_step) and (not use_compile):
             inference_step(model, device, device_type, ddp_rank)
     
     if ddp:
