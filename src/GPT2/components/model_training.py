@@ -130,7 +130,7 @@ def train_model(training_config, gpt_config, data_transformation_config, dist_co
             model = DDP(model, device_ids=[ddp_local_rank])
     # a consistent way to access the underlying model, whether it's wrapped in DDP or not.
     raw_model = model.module if ddp else model 
-    optimizer = raw_model.configure_optimizer(weight_decay=gpt_config.weight_decay, learning_rate=gpt_config.learning_rate, betas=gpt_config.betas ,device_type=device_type)
+    optimizer = raw_model.configure_optimizer(weight_decay=gpt_config.weight_decay, learning_rate=gpt_config.learning_rate, betas=gpt_config.betas ,device_type=device_type, master_process=master_process )
 
     def get_lr(it):
         # 1) linear warmup for warmup_iters steps 

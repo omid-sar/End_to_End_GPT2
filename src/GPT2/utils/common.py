@@ -1,7 +1,7 @@
 import os
 from box.exceptions import BoxValueError
 import yaml
-from GPT2.logging import logger, is_master_process
+from GPT2.logging import logger
 from ensure import ensure_annotations
 from box import ConfigBox
 from pathlib import Path
@@ -27,8 +27,8 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
     try:
         with open(path_to_yaml) as yaml_file:
             content = yaml.safe_load(yaml_file)
-            if is_master_process:
-                logger.info(f"yaml file: {path_to_yaml} loaded successfully")
+            # prevent multiple rewrites on a cluster of GPUs setting
+            # logger.info(f"yaml file: {path_to_yaml} loaded successfully") 
             return ConfigBox(content)
     except BoxValueError:
         raise ValueError("yaml file is empty")
@@ -47,9 +47,9 @@ def create_directories(path_to_directories: list, verbose=True):
     """
     for path in path_to_directories:
         os.makedirs(path, exist_ok=True)
-        if verbose:
-            if is_master_process:
-                logger.info(f"created directory at: {path}")
+        # prevent multiple rewrites on a cluster of GPUs setting
+        # if verbose:
+        #     logger.info(f"created directory at: {path}") 
 
 
 

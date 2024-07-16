@@ -105,8 +105,9 @@ def setup_distributed():
     # Log device information
     logger.info(f"Using device: {device}")
     if device.startswith('cuda'):
-        logger.info(f"Device name: {torch.cuda.get_device_name(0)}")
-        logger.info(f"Device memory: {torch.cuda.get_device_properties(0).total_memory / 1024 ** 3:.2f} GB")
+        if master_process:
+            logger.info(f"Device name: {torch.cuda.get_device_name(0)}")
+            logger.info(f"Device memory: {torch.cuda.get_device_properties(0).total_memory / 1024 ** 3:.2f} GB")
     elif device == 'mps':
         logger.info("Device name: Apple Metal Performance Shaders (MPS)")
     else:
