@@ -1,4 +1,5 @@
 import sys
+import torch
 from GPT2.logging import logger
 from GPT2.pipeline.stage_01_data_ingestion import DataIngestionTrainingPipeline
 from GPT2.pipeline.stage_02_data_transformation import DataTransformationTrainingPipeline
@@ -21,6 +22,9 @@ def main():
         data_transformation = DataTransformationTrainingPipeline()
         data_transformation.main(use_multiprocessing=True)  #***Change as needed
         logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx{'=' * 80}x")
+
+    if dist_config.ddp:
+        torch.distributed.barrier()
 
     STAGE_NAME = "Model Training stage"
     try:
