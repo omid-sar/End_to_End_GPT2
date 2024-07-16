@@ -70,10 +70,12 @@ def save_initial_weights(model, file_path):
         logger.error(f"Failed to save initial weights: {e}")
 
 
-# Simple launch: =>>> 
-# python main.py
-# DDP launch for e.g.b 8 GPUs: =>>> 
-# torchrun --standalone --nproc_per_node=8 main.py
+
+def initialize_distributed():
+     # This ensures that the process group is only initialized once.
+    if int(os.environ.get('RANK', -1)) != -1:
+        if not dist.is_initialized():
+            init_process_group(backend='nccl')
 
 
 def setup_distributed():

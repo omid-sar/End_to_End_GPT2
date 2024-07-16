@@ -6,13 +6,6 @@ import torch.nn as nn
 from torch.nn import functional as F
 from GPT2.logging import logger, is_master_process
 
-# ----------- Temporary to load Config localy here not main.py -----
-#from GPT2.config.configuration import ConfigurationManager
-#import os
-#os.getcwd()
-#os.chdir('../../../')
-#config = ConfigurationManager()
-# -------------------------------------------------------------------
 
 @dataclass 
 class GPTConfig:

@@ -45,10 +45,10 @@ class DataTokenizer:
         assert (0 <= tokens_np).all() and (tokens_np < 2**16).all(), "token dictionary too large for uint16"
         tokens_np_uint16 = tokens_np.astype(np.uint16)
         return tokens_np_uint16
-
     def write_datafile(self, filename, tokens_np):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         np.save(filename, tokens_np, allow_pickle=False)
-
+ 
     def process_single_document(self, doc):
         return self.tokenize(doc)
 
@@ -91,7 +91,7 @@ def process_documents_parallel(tokenizer):
     os.makedirs(tokenizer.transformed_file_path, exist_ok=True)
     logger.info(f"Created directory at: {tokenizer.transformed_file_path}")
 
-    nprocs = max(1, os.cpu_count()//2)
+    nprocs = max(1, os.cpu_count()- 1)
     with mp.Pool(nprocs) as pool:
         shard_index = 0
         all_tokens_np = np.empty((tokenizer.config.shard_size,), dtype=np.uint16)
@@ -121,71 +121,4 @@ def process_documents_parallel(tokenizer):
             split = "val" if shard_index == 0 else "train"
             filename = os.path.join(tokenizer.transformed_file_path, f"{tokenizer.config.dataset}_{split}_{shard_index:06d}")
             tokenizer.write_datafile(filename, all_tokens_np[:token_count])
-
-def load_tokens(filename):
-    npt = np.load(filename)
-    npt = npt.astype(np.int32) 
-    ppt = torch.tensor(npt, dtype=torch.long)
-    return ppt
-
-class DataLoaderLite:
-    def __init__(self, config, dist_config, split):
-        self.B = config.B
-        self.T = config.T
-        self.process_rank = dist_config.ddp_rank
-        self.num_processes = dist_config.ddp_world_size
-        master_process = dist_config.master_process
-        self.split = split
-        assert split in {'train', 'val'}
-        self.rng = np.random.default_rng(1337)
-
-        data_path = Path(os.path.join(config.local_data_file, config.dataset_name))
-        shards = os.listdir(data_path)
-        shards = [s for s in shards if split in s ]
-        shards = sorted(shards)
-        shards = [os.path.join(data_path, s) for s in shards]
-        self.shards = shards
-        assert len(shards) > 0 , f"No shards found for split: {split}"
-        if master_process:
-            logger.info(f" Found {len(shards)} shards for solit: {split}")
-        self.reset()
-
-    def load_shard(self, filename):
-        shard = load_tokens(filename)
-        enc = tiktoken.get_encoding("gpt2")
-        if self.split == "train":
-            # split tokens into documents using the <|endoftext|> token and shuffle
-            eot_positions = (torch.where(shard == enc.eot_token)[0] + 1).tolist()
-            documents = [shard[start:end] for start, end in zip([0] + eot_positions[:-1], eot_positions)]
-            self.rng.shuffle(documents)
-            shard = torch.cat(documents) # concatenate the documents back together
-        return shard
-
-
-    def reset(self):
-        self.current_shard = 0
-        if self.split == "train":
-            self.rng.shuffle(self.shards)
-        self.tokens = self.load_shard(self.shards[self.current_shard])
-        #self.tokens = load_tokens(self.shards[self.current_shard])
-        self.current_position = self.B * self.T * self.process_rank
-
-    def next_batch(self):
-        buf = self.tokens[self.current_position : self.current_position+self.B*self.T+1 ]
-        x = buf[:-1].view(self.B, self.T)
-        y = buf[1:].view(self.B, self.T)
-        self.current_position += self.B * self.T * self.num_processes
-        # If loading the next batch would be out of bounds, move to the next shard.
-        if self.current_position + (self.B * self.T * self.num_processes + 1 )> len(self.tokens):
-            self.current_shard += 1
-            # reshuffle after each epoch
-            if self.current_shard == len(self.shards):
-                self.reset()
-            else:
-                self.tokens = self.load_shard(self.shards[self.current_shard])
-                self.current_position = self.B * self.T * self.process_rank          
-            # self.current_shard = (self.current_shard + 1) % len(self.shards)
-            # self.tokens = load_tokens(self.shards[self.current_shard])
-            # self.current_position = self.B * self.T * self.process_rank
-        return x, y
 

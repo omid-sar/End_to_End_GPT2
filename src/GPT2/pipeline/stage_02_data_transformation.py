@@ -1,6 +1,6 @@
 from GPT2.logging import logger 
 from GPT2.config.configuration import ConfigurationManager
-from GPT2.components.data_transformation import DataTokenizer, process_documents_parallel, DataLoaderLite
+from GPT2.components.data_transformation import DataTokenizer, process_documents_parallel
 from GPT2.utils.model_utils import setup_distributed
 
 
@@ -22,11 +22,6 @@ class DataTransformationTrainingPipeline():
             else:
                 tokenizer.process_documents_sequential()
                 
-            train_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
-            val_loader = DataLoaderLite(config=data_transformation_config, dist_config=dist_config, split="train")
-
-            return train_loader, val_loader
-        
         except Exception as e:
             logger.error(f"An error occurred during data transformation: {str(e)}")
             raise

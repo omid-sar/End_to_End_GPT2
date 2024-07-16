@@ -29,4 +29,3 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger("GPT2")
-
